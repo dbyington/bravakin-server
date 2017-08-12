@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start":"node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +19,11 @@
   "homepage": "https://github.com/dbyington/bravakin-server#readme",
   "dependencies": {
     "chai": "^4.1.1",
+    "kcors": "^2.2.1",
+    "koa": "^2.3.0",
+    "koa-body": "^2.3.0",
+    "koa-logger": "^3.0.1",
+    "koa-router": "^7.2.1",
     "mocha": "^3.5.0"
   }
 }
