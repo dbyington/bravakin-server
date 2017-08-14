@@ -55,11 +55,18 @@ const getFilteredUser = async (accessToken, filterCallback) => {
 const filterAccessToken = (u) => !u.access_token;
 
 const addPreferences = (user, adds) => {
-  return Object.assign({}, user, adds);
+  const updatedUser = Object.assign({}, user, adds);
+  return updateUserPref(updatedUser);
 }
+
+const updateUserPref = (user) => await User.update(
+  {id: user.id},
+  {$set: {be_like: user.be_like, like_tags: user.like_tags}},
+  {new: true}
+);
 
 const removePreferences = (user, removes) => {
   user.like_tags = _.filter(user.like_tags, (tag) => !_.includes(removes.like_tags, tag));
   user.be_like = _.filter(user.be_like, (name) => !_.includes(removes.be_like, name));
-  return user;
+  return updateUserPref(user);
 }
