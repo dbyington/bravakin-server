@@ -1,7 +1,7 @@
 const router = require('koa-router')();
 
 router
-  .get('/login', function (ctx, next) {
+  .get('/authorize', function (ctx, next) {
     ctx.body = 'Hello Login!';
   })
   .get('/user/activity', function (ctx, next) {
@@ -28,7 +28,7 @@ router
   .get('/influence', function (ctx, next) {
     ctx.body = 'Hello influence!';
   })
-  .put('/logout', function (ctx, next) {
+  .put('/unauthorize', function (ctx, next) {
     ctx.body = 'Goodbye Logout!';
   })
   .put('/user', function (ctx, next) {

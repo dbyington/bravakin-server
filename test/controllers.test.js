@@ -1,23 +1,19 @@
-const should = require('chai').should;
+const should = require('chai').should();
 const mocks = require('./mocks');
 const users = require('../controllers/users.controller');
 
 describe('Users', function() {
-  describe('GET /login', function() {
+  describe('GET /authorize', function() {
     it('should return the user object', function(){
-      users.handleUserLogin(mocks.ctx);
+      users.handleAuthorizeUser(mocks.ctx);
       mocks.ctx.body.should.eql(mocks.user);
     });
     it('should return the access token', function(){
-      users.handleUserLogin(mocks.ctx);
+      users.handleAuthorizeUser(mocks.ctx);
       mocks.ctx.body.data.access_token.should.eql(mocks.access_token);
     });
-    it('should redirect if no access token is provided', function(){
-      users.handleUserLogin(mocks.ctx);
-      ctx.redirect.called.should.be(true);
-    });
   });
-  
+
   describe('GET /user', function() {
     it('should return the user object', function(){
       users.handleUserGet(mocks.ctx);
@@ -41,11 +37,11 @@ describe('Users', function() {
     });
   });
 
-  describe('PUT /logout', function() {
+  describe('PUT /unauthorize', function() {
     it('should return status code 200: ok', function(){
-      users.handleUserLogout(mocks.ctx);
-      mocks.ctx.status.should.be(200);
-      mocks.ctx.body.should.be('OK');
+      users.handleUnauthorizeUser(mocks.ctx);
+      mocks.ctx.status.should.equal(200);
+      mocks.ctx.body.should.equal('OK');
     } )
   })
 

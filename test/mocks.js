@@ -4,7 +4,8 @@ const ctx = {
   redirect: sinon.stub(),
   request: {},
   response: {},
-  body: {}
+  body: {},
+  header: {}
 };
 
 const user = {
@@ -23,7 +24,7 @@ const user = {
   }
 };
 
-const loginUser = Object.assign({}, user, {'access_token': 'ACCESS_TOKEN'});
+const authUser = Object.assign({}, user, {'access_token': 'ACCESS_TOKEN'});
 const getUser = Object.assign({}, user, {
   'be_like': ['Yahweh', 'The Messiah', 'Godzilla'],
   'like_tags': ['landscape','adventure']
