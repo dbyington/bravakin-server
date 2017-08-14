@@ -4,10 +4,10 @@ router
   .get('/authorize', function (ctx, next) {
     ctx.body = 'Hello Login!';
   })
-  .get('/user/activity', function (ctx, next) {
+  .get('/me/activity', function (ctx, next) {
     ctx.body = 'Hello activity!';
   })
-  .get('/user', function (ctx, next) {
+  .get('/me', function (ctx, next) {
     ctx.body = 'Hello user!';
   })
   .get('/tags/:tag_name', function (ctx, next) {
@@ -31,7 +31,7 @@ router
   .put('/unauthorize', function (ctx, next) {
     ctx.body = 'Goodbye Logout!';
   })
-  .put('/user', function (ctx, next) {
+  .put('/me', function (ctx, next) {
     ctx.body = 'Update user!';
   })
   .put('/media/:id/like', function (ctx, next) {

@@ -39,7 +39,8 @@ const _getAccessToken = (ctx) => {
         function(err, d) {
           if (err) ctx.throw(500, JSON.stringify({error: {status: 500, error_message: err}}));
           return d;
-        });
+        }
+      );
     } else {
       const newUser = new User(
         access_token: data.access_token,
