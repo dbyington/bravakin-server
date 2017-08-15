@@ -2,23 +2,23 @@
 
 const User = require('../models/user.model');
 const db = require('../db');
-const _ = require('lodash');
+const UserSerializer = require('../middlewares/user-serializer');
 
 module.exports.handleAuthorizeUser = async (ctx, next) => {
-  const user = await getFilteredUser(ctx.status.accessToken);
+  const user = await getDatabaseUser(ctx.state.accessToken);
   ctx.status = 200;
-  ctx.body = user;
+  ctx.body = UserSerializer.serializeWithToken(user);
 };
 
 
 module.exports.handleUserGet = async (ctx, next) => {
-  const user = await getFilteredUser(ctx.status.accessToken, filterAccessToken);
+  const user = await getDatabaseUser(ctx.state.accessToken);
   ctx.status = 200;
-  ctx.body = user;
+  ctx.body = UserSerializer.serialize(user);
 };
 
 module.exports.handleUserUpdate = async (ctx, next) => {
-  let user = await getFilteredUser(ctx.status.accessToken);
+  let user = await getDatabaseUser(ctx.state.accessToken);
   if (ctx.body.remove) {
     user = removePreferences(user, ctx.body.remove);
   }
@@ -26,11 +26,12 @@ module.exports.handleUserUpdate = async (ctx, next) => {
     user = addPreferences(user, ctx.body.add);
   }
   ctx.status = 200;
-  ctx.body = getFilteredUser(accessToken, filterAccessToken);
+  user = getDatabaseUser(accessToken);
+  ctx.body = UserSerializer.serialize(user);
 };
 
 module.exports.handleUnauthorizeUser = async (ctx, next) => {
-  const user = await User.findOne({access_token: ctx.status.accessToken});
+  const user = await User.findOne({access_token: ctx.state.accessToken});
   user = await User.findByIdAndUpdate(user._id,
     { $set: {access_token: ''}},
     {new: true},
@@ -43,23 +44,21 @@ module.exports.handleUnauthorizeUser = async (ctx, next) => {
   ctx.body = "OK";
 };
 
-const getFilteredUser = async (accessToken, filterCallback) => {
-  let user = await User.find({access_token: accessToken});
+const getDatabaseUser = async (accessToken) => {
+  const user = await User.findOne({access_token: accessToken}, (err, doc) => {
+    if (err) console.log('error has been found', err);
+  });
+
   if (!user['access_token']) ctx.throw(401, 'unauthorized');
-  if(typeof filterCallback === 'function') {
-    user = _.filter(user, filterCallback);
-  }
   return user;
 }
-
-const filterAccessToken = (u) => !u.access_token;
 
 const addPreferences = (user, adds) => {
   const updatedUser = Object.assign({}, user, adds);
   return updateUserPref(updatedUser);
 }
 
-const updateUserPref = (user) => await User.update(
+const updateUserPref = async (user) => await User.update(
   {id: user.id},
   {$set: {be_like: user.be_like, like_tags: user.like_tags}},
   {new: true}

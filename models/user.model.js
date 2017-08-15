@@ -10,3 +10,6 @@ const userSchema = new Schema({
   like_tags: Array,
   access_token: String
 });
+
+const User = mongoose.model('User', userSchema);
+module.exports = User;

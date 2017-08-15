@@ -5,23 +5,15 @@ const ctx = {
   request: {},
   response: {},
   body: {},
-  header: {}
+  header: {},
+  status: 0
 };
 
 const user = {
-  'data': {
-    'id': '42',
+    'id': 42,
     'username': 'zbeeble',
     'full_name': 'Zaphod Beeblebrox',
     'profile_picture': 'http://distillery.s3.amazonaws.com/profiles/profile_42_75sq_1295469061.jpg',
-    'bio': 'This is my bio',
-    'website': 'http://mygalaxy.com',
-    'counts': {
-      'media': 1320,
-      'follows': 420,
-      'followed_by': 3410
-    }
-  }
 };
 
 const authUser = Object.assign({}, user, {'access_token': 'ACCESS_TOKEN'});
@@ -46,8 +38,11 @@ const userUpdate = {
 }
 
 
+
 module.exports = {
   user,
   ctx,
-  userUpdate
+  authUser,
+  getUser,
+  userUpdate,
 };

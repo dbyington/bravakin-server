@@ -56,8 +56,7 @@ const _getAccessToken = (ctx) => {
       }
     }
 
-    ctx.status.accessToken = user.access_token;
-    ctx.status.userIt = user.id;
+    ctx.state.accessToken = user.access_token;
     return user;
   })
   .catch( err => {
@@ -82,7 +81,6 @@ modules.exports.checkAuth = async (ctx, next) => {
     // not a valid access_token
     ctx.throw(401, 'unauthorized');
   }
-  ctx.status.accessToken = accessToken;
-  ctx.status.userId = user.id;
+  ctx.state.accessToken = accessToken;
   next();
 }
