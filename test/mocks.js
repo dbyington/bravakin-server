@@ -2,6 +2,7 @@ const sinon = require('sinon');
 
 const ctx = {
   redirect: sinon.stub(),
+  throw: sinon.stub(),
   request: {},
   response: {},
   body: {},
@@ -16,11 +17,15 @@ const user = {
     'profile_picture': 'http://distillery.s3.amazonaws.com/profiles/profile_42_75sq_1295469061.jpg',
 };
 
-const authUser = Object.assign({}, user, {'access_token': 'ACCESS_TOKEN'});
 const getUser = Object.assign({}, user, {
   'be_like': ['Yahweh', 'The Messiah', 'Godzilla'],
   'like_tags': ['landscape','adventure']
 });
+const modifiedUser = Object.assign({}, user, {
+  'be_like': ['Yahweh', 'The Messiah'],
+  'like_tags': ['landscape','adventure','beachvolley','power']
+});
+const authUser = Object.assign({}, getUser, {'access_token': 'ACCESS_TOKEN'});
 
 
 const userUpdate = {
@@ -45,4 +50,5 @@ module.exports = {
   authUser,
   getUser,
   userUpdate,
+  modifiedUser
 };

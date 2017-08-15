@@ -1,6 +1,6 @@
 'use strict';
 
-const userProps = ['id', 'username', 'full_name', 'profile_picture'];
+const userProps = ['id', 'username', 'full_name', 'profile_picture', 'like_tags', 'be_like'];
 
 module.exports.serialize = (user) => {
   const userz = _seralize(user, userProps);
