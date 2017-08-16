@@ -1,5 +1,4 @@
-
-
+'use strict';
 
 // it('should return 401 unauthorized if no access token or code is provided', function(){
 //   const ctx = Object.assign({},mocks.ctx);

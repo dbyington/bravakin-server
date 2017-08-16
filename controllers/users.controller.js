@@ -11,7 +11,6 @@ module.exports.handleAuthorizeUser = async (ctx, next) => {
   ctx.body = UserSerializer.serializeWithToken(user);
 };
 
-
 module.exports.handleUserGet = async (ctx, next) => {
   const user = await getDatabaseUser(ctx.state.accessToken);
   if (user.error) ctx.throw(user.code, user.error);
@@ -37,15 +36,15 @@ module.exports.handleUserUpdate = async (ctx, next) => {
 module.exports.handleUnauthorizeUser = async (ctx, next) => {
   let user = await User.findOne({access_token: ctx.state.accessToken});
   user = await User.findByIdAndUpdate(user._id,
-    { $set: {access_token: ''}},
+    {$set: {access_token: ''}},
     {new: true},
-    function(err, d) {
+    function (err, d) {
       if (err) ctx.throw(500, JSON.stringify({error: {status: 500, error_message: err}}));
       return d;
     }
   );
   ctx.status = 200;
-  ctx.body = "OK";
+  ctx.body = 'OK';
 };
 
 const getDatabaseUser = async (accessToken) => {
@@ -59,7 +58,8 @@ const getDatabaseUser = async (accessToken) => {
 const addPreferences = async (user, adds) => {
   if (adds.like_tags) user.like_tags = [...new Set(user.like_tags.concat(adds.like_tags))];
   if (adds.be_like) user.be_like = [...new Set(user.be_like.concat(adds.be_like))];
-  return await updateUserPref(user);
+  const returnUser = await updateUserPref(user);
+  return returnUser;
 }
 
 const updateUserPref = async (user) => {
@@ -76,6 +76,7 @@ const updateUserPref = async (user) => {
 const removePreferences = async (user, removes) => {
   if (removes.like_tags) user.like_tags = user.like_tags.filter((tag) => !removes.like_tags.includes(tag));
   if (removes.be_like) user.be_like = user.be_like.filter((name) => !removes.be_like.includes(name));
-  return await updateUserPref(user);
+  const returnUser = await updateUserPref(user);
+  return returnUser;
 }
 module.exports._helpers = {getDatabaseUser, addPreferences, updateUserPref, removePreferences};
