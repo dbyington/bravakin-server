@@ -5,21 +5,19 @@ const request = require('request-promise');
 const User = require('../models/user.model');
 const db = require('../db');
 
-const getAccessTokenUrl = 'https://api.instagram.com/oauth/access_token';
-const CLIENT_ID = '38553e7b653747dfa48428b052c7369d';
-const CLIENT_SECRET = 'b5466dfe3a7f470180f8148345bb67db';
+const api = require('../.api-credentials');
 
 const _getAccessToken = async (ctx) => {
   const form = {
-    client_id: CLIENT_ID,
-    client_secret: CLIENT_SECRET,
+    client_id: api.CLIENT_ID,
+    client_secret: api.CLIENT_SECRET,
     grant_type: 'authorization_code',
     redirect_uri: 'https://me/authorize',
     code: ctx.params.code
   };
 
   const postOptions = {
-    url: getAccessTokenUrl,
+    url: api.getAccessTokenUrl,
     method: 'POST',
     form: form
   }
