@@ -2,7 +2,7 @@
 
 const User = require('../models/user.model');
 const db = require('../db');
-const UserSerializer = require('../middlewares/user-serializer');
+const UserSerializer = require('../utils/user-serializer');
 
 module.exports.handleAuthorizeUser = async (ctx, next) => {
   const user = await getDatabaseUser(ctx.state.accessToken);

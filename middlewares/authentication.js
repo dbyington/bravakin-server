@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config();
 const fetch = require('node-fetch');
 const request = require('request-promise');
 const User = require('../models/user.model');
@@ -6,21 +7,17 @@ const User = require('../models/user.model');
 const User = require('../models/user.model');
 const db = require('../db');
 
-const getAccessTokenUrl = 'https://api.instagram.com/oauth/access_token';
-const CLIENT_ID = '38553e7b653747dfa48428b052c7369d';
-const CLIENT_SECRET = 'b5466dfe3a7f470180f8148345bb67db';
-
 const _getAccessToken = (ctx) => {
   const form = {
-    client_id = CLIENT_ID,
-    client_secret = CLIENT_SECRET,
+    client_id = process.env.CLIENT_ID,
+    client_secret = process.env.CLIENT_SECRET,
     grant_type = 'authorization_code',
     redirect_uri = 'https://me/authorize',
     code = ctx.params.code
   };
 
   const postOptions = {
-    url: getAccessTokenUrl,
+    url: process.env.URL,
     method: 'POST',
     form: form
   }

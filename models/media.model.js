@@ -9,3 +9,6 @@ const mediaSchema = new Schema({
   comments: Number,
   tags: Array
 });
+
+const Media = mongoose.model('Media', mediaSchema);
+module.exports = Media;

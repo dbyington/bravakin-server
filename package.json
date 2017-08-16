@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/dbyington/bravakin-server#readme",
   "dependencies": {
+    "dotenv": "^4.0.0",
     "kcors": "^2.2.1",
     "koa": "^2.3.0",
     "koa-body": "^2.3.0",
