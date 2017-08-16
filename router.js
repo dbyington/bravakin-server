@@ -38,6 +38,4 @@ router
     ctx.body = 'Update changing my mind on the like!';
   });
 
-
-
-  module.exports = router;
+module.exports = router;

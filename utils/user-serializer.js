@@ -11,7 +11,7 @@ module.exports.serializeWithToken = (user) => {
   return _seralize(user, [...userProps, 'access_token']);
 }
 
-function _seralize(user, userProps) {
+function _seralize (user, userProps) {
   return userProps.reduce((acc, el) => {
     acc[el] = user[el];
     return acc;

@@ -39,8 +39,8 @@ describe('Users', function() {
     });
   });
 
-  describe('PUT /me', function() {
-    it('should update the user', async function(){
+  describe('PUT /me', function () {
+    it('should update the user', async function () {
       await User.update({accessToken: 'ACCESS_TOKEN'}, {$set: {like_tags: ['landscape', 'adventure'], be_like: ['Yahweh', 'The Messiah', 'Godzilla']}}, {new: true});
       const updatedUser = Object.assign({}, mocks.getUser, {
         like_tags: ['beachvolley', 'power']
@@ -57,8 +57,8 @@ describe('Users', function() {
       await users.handleUnauthorizeUser(ctx);
       ctx.status.should.equal(200);
       ctx.body.should.equal('OK');
-    } )
-  })
+    });
+  });
 });
 
 describe('helper functions', function(){
@@ -69,5 +69,4 @@ describe('helper functions', function(){
       user.access_token.should.equal('ACCESS_TOKEN');
     });
   });
-
 });
