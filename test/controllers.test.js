@@ -6,34 +6,34 @@ const users = require('../controllers/users.controller');
 const db = require('../db');
 const User = require('../models/user.model');
 
-beforeEach(async function () {
+let ctx;
+
+beforeEach(async function() {
+  ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
   await User.remove({id: 42});
   const user = new User(mocks.authUser);
   await user.save();
 });
 
-describe('Users', function () {
-  describe('GET /authorize', function () {
-    it('should return the user object', async function () {
-      let ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
+
+describe('Users', function() {
+  describe('GET /authorize', function() {
+    it('should return the user object', async function(){
       await users.handleAuthorizeUser(ctx);
       ctx.body.should.eql(mocks.authUser);
     });
-    it('should return the access token', async function () {
-      let ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
+    it('should return the access token', async function(){
       await users.handleAuthorizeUser(ctx);
       ctx.body.access_token.should.eql(mocks.authUser.access_token);
     });
   });
 
-  describe('GET /me', function () {
-    it('should return the user object', async function () {
-      let ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
+  describe('GET /me', function() {
+    it('should return the user object', async function(){
       await users.handleUserGet(ctx);
       ctx.body.should.eql(mocks.getUser);
     });
-    it('should not return an access token', async function () {
-      let ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
+    it('should not return an access token', async function(){
       await users.handleUserGet(ctx);
       should.not.exist(mocks.access_token);
     });
@@ -42,7 +42,6 @@ describe('Users', function () {
   describe('PUT /me', function () {
     it('should update the user', async function () {
       await User.update({accessToken: 'ACCESS_TOKEN'}, {$set: {like_tags: ['landscape', 'adventure'], be_like: ['Yahweh', 'The Messiah', 'Godzilla']}}, {new: true});
-      let ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
       const updatedUser = Object.assign({}, mocks.getUser, {
         like_tags: ['beachvolley', 'power']
       });
@@ -53,9 +52,8 @@ describe('Users', function () {
     });
   });
 
-  describe('PUT /unauthorize', function () {
-    it('should return status code 200: ok', async function () {
-      let ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
+  describe('PUT /unauthorize', function() {
+    it('should return status code 200: ok', async function(){
       await users.handleUnauthorizeUser(ctx);
       ctx.status.should.equal(200);
       ctx.body.should.equal('OK');
@@ -63,10 +61,9 @@ describe('Users', function () {
   });
 });
 
-describe('helper functions', function () {
-  describe('getDatabaseUser', function () {
-    it('should return valid user with valid access_token', async function () {
-      let ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}});
+describe('helper functions', function(){
+  describe('getDatabaseUser', function(){
+    it('should return valid user with valid access_token', async function(){
       const user = await users._helpers.getDatabaseUser(ctx.state.accessToken);
       user.id.should.equal(42);
       user.access_token.should.equal('ACCESS_TOKEN');
