@@ -26,6 +26,8 @@ const modifiedUser = Object.assign({}, user, {
   'like_tags': ['landscape', 'adventure', 'beachvolley', 'power']
 });
 const authUser = Object.assign({}, getUser, {'access_token': 'ACCESS_TOKEN'});
+const extraPropsUser = Object.assign({}, authUser, {'foo': 'bar'});
+const userSerializedProps = ['id', 'username', 'full_name', 'profile_picture', 'like_tags', 'be_like'];
 
 const userUpdate = {
   'remove': {
@@ -47,5 +49,7 @@ module.exports = {
   authUser,
   getUser,
   userUpdate,
-  modifiedUser
+  modifiedUser,
+  extraPropsUser,
+  userSerializedProps
 };
