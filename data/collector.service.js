@@ -47,6 +47,9 @@ class Collector {
     }
   }
 
+  // TODO: update to reflect the followers array is on User and
+  // num_followers is in UserStats.
+
   async _saveUserStats (dbUser, scrapeUser) {
     const newFollowersList = scrapeUser['followers']
       .filter(f => !dbUser['followers'][f]);

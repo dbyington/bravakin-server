@@ -6,7 +6,7 @@ const mediaStatsSchema = new Schema({
   id: Number,
   likes: Number,
   comments: Number,
-  timestamp: Date
+  collected_at: Number
 });
 
 const MediaStats = mongoose.model('MediaStats', mediaStatsSchema);
