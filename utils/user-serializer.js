@@ -3,8 +3,7 @@
 const userProps = ['id', 'username', 'full_name', 'profile_picture', 'like_tags', 'be_like'];
 
 module.exports.serialize = (user) => {
-  const userz = _seralize(user, userProps);
-  return userz;
+  return  _seralize(user, userProps);
 }
 
 module.exports.serializeWithToken = (user) => {
