@@ -1,23 +1,22 @@
 'use strict';
+require('dotenv').config();
 const fetch = require('node-fetch');
 const request = require('request-promise');
 
 const User = require('../models/user.model');
 const db = require('../db');
 
-const api = require('../.api-credentials');
-
-const _getAccessToken = async (ctx) => {
+const _getAccessToken = (ctx) => {
   const form = {
-    client_id: api.CLIENT_ID,
-    client_secret: api.CLIENT_SECRET,
-    grant_type: 'authorization_code',
-    redirect_uri: 'https://me/authorize',
-    code: ctx.params.code
+    client_id = process.env.CLIENT_ID,
+    client_secret = process.env.CLIENT_SECRET,
+    grant_type = 'authorization_code',
+    redirect_uri = 'https://me/authorize',
+    code = ctx.params.code
   };
 
   const postOptions = {
-    url: api.getAccessTokenUrl,
+    url: process.env.URL,
     method: 'POST',
     form: form
   }
