@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const mediaSchema = new Schema({
-  id: Number,
+  id: String,
   title: String,
   url: String,
   link: String,
-  posted_at: Date,
+  posted_at: Number,
   tags: Array
 });
 

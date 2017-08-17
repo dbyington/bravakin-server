@@ -1,17 +1,16 @@
 'use strict';
+require('dotenv').config();
 
 const request = require('request-promise');
 
-const api = require('../.api-credentials');
-const db = require('../db');
-const User = require('../models/user.model');
 const UserStats = require('../models/user-stats.model');
 const Media = require('../models/media.model');
-const MediaStats = require('../models/user.model');
+const MediaStats = require('../models/media-stats.model');
 
-const apiSelfUrl = api.url + '/user'; // for username, num_followers
-const apiFollowersUrl = api.url + '/self/followed-by'; // for follower names
-const apiSelfMediaUrl = api.url + '/user/self/media/recent' // for media details
+const apiUrl = 'https://api.instagram.com/v1';
+const apiSelfUrl = apiUrl + '/users/self'; // for username, num_followers
+const apiFollowersUrl = apiSelfUrl + '/followed-by'; // for follower names
+const apiSelfMediaUrl = apiSelfUrl + '/media/recent' // for media details
 // follower's recent media /users/{user-id}/media/recent
 
 class ApiClient {
@@ -19,17 +18,19 @@ class ApiClient {
   async updateUserStats (dbUser) {
     let data;
     const accessTokenParam = '?access_token=' + dbUser['access_token'];
+    const uri = apiSelfUrl + accessTokenParam;
     try {
-      data = await request.get(apiSelfUrl + accessTokenParam);
+      data = await request(uri);
     } catch (e) {
       console.log('error retriving api self');
     }
-    if (data['user']) {
-      const user = data['user'];
+    const response = JSON.parse(data);
+    if (response['data']) {
+      const user = response['data'];
       if (dbUser) {
         // update num_followers in UserStats
         const statsUpdate = new UserStats({
-          id: dbUser['_id'],
+          id: dbUser['id'],
           num_followers: user['counts'].followed_by,
           collected_at: Date.now()
         });
@@ -38,18 +39,6 @@ class ApiClient {
         } catch (e) {
           console.log('problem saving num_followers stat:', e);
           throw (e);
-        }
-        // get and update followers in User
-        const apiFollowers = await this._getFollowers(dbUser);
-
-        const followersUpdate = apiFollowers.filter(f => !dbUser['followers'].f)
-        try {
-          await User.update(
-            {'_id': dbUser['_id']},
-            {$set: { followers: followersUpdate }}
-          );
-        } catch (e) {
-          console.log('problem updating user follower');
         }
       }
     }
@@ -76,9 +65,11 @@ class ApiClient {
 
   async _getArrayFrom (url) {
     let arr = [];
+    let response = {};
+    response['data'] = ['this', 'is', 'a', 'test'];
     try {
       do {
-        const response = await request.get(url);
+        const response = JSON.parse(await request.get(url));
         arr = arr.concat(response['data']);
         url = response['pagination'] ? response['pagination'].next_url : undefined;
       } while (url);
@@ -90,15 +81,18 @@ class ApiClient {
   }
 
   async _saveMediaStat (newApiMedia) {
-    newApiMedia['data'].forEach(async m => {
+    // newApiMedia.forEach(async m => {
+    for (let i = 0; i < newApiMedia.length; i++) {
+      const m = newApiMedia[i];
       let dbMedia;
       try {
-        dbMedia = await Media.findOne({name: m['id']});
+        dbMedia = await Media.findOne({id: m['id']});
+        // console.log('dbMedia found:', dbMedia);
       } catch (e) {
         console.log('error getting media id:', e);
       }
       // if no myId, insert new media and save stats on that id
-      if (!dbMedia['id']) {
+      if (!dbMedia) {
         const newMedia = new Media({
           id: m['id'],
           title: m['title'],
@@ -124,7 +118,7 @@ class ApiClient {
       } catch (e) {
         console.log('problem saving new media stats:', e);
       }
-    });
+    }
   }
 }
 
