@@ -5,13 +5,9 @@ HOST: TBD
 
 Some Bravakin project.
 
-## Login [/login]
+## Authorize [/authorize]
 
 ### Authenticate or verify a user [GET]
-
-If a valid access_token is not provided the requestor will be redirected
-for authentication. After authentication the requestor will presented the 
-same JSON reply with the addition of the access_token.
 
 + Request (application/json)
 
@@ -27,19 +23,14 @@ same JSON reply with the addition of the access_token.
                 "username": "zbeeble",
                 "full_name": "Zaphod Beeblebrox",
                 "profile_picture": "http://distillery.s3.amazonaws.com/profiles/profile_42_75sq_1295469061.jpg",
-                "bio": "This is my bio",
-                "website": "http://mygalaxy.com",
-                "counts": {
-                    "media": 1320,
-                    "follows": 420,
-                    "followed_by": 3410
-                },
-                "access_token": "ACCESS_TOKEN"
+                "access_token": "ACCESS_TOKEN",
+                "like_tags": [],
+                "be_like": []
             }
         }
 
 
-## Logout [/logout]
+## Unauthorize [/unauthorize]
 
 ### Remove a user's access_token from the database [PUT]
 
@@ -52,7 +43,7 @@ same JSON reply with the addition of the access_token.
 + Response 200 (application/json)
 
 
-## User details [/user]
+## User details [/me]
 
 ### Get current user details [GET]
 
@@ -77,15 +68,9 @@ same JSON reply with the addition of the access_token.
                 "like_tags": [
                     "landscape",
                     "adventure",
-                ],
-                "counts": {
-                    "media": 1320,
-                    "follows": 420,
-                    "followed_by": 3410
-                }
+                ]
             }
         }
-
 
 ### Update current user "be like" and "tags" preferences [PUT]
 Send an "add" object to add to the respective list ("be_like" or "like_tags").
@@ -101,6 +86,7 @@ Send an "update" object to rewrite the list.
     + Body
     
             {
+                "save": "JustAstring",
                 "update": {
                     "be_like": [ 
                         "Yahweh", 
@@ -132,16 +118,13 @@ Send an "update" object to rewrite the list.
                     "adventure",
                     "beachvolley",
                     "power"
-                ],
-                "counts": {
-                    "media": 1320,
-                    "follows": 420,
-                    "followed_by": 3410
-                }
+                ]
             }
         }
 
-## User activity [/user/activity]
+## User activity [/me/activity]
+
+Not implimented
 
 ### Get current user's activity [GET]
 
@@ -163,6 +146,8 @@ Not implimented
 
 
 ## Get media by tag [/tags/{tag_name}{?offset,size}]
+
+Not implimented
 
 + Parameters
 
@@ -213,6 +198,8 @@ Not implimented
 
 ## Specific media [/media/{id}]
 
+Not yet implimented
+
 + Parameters
 
     + id: 34632 (required) - Id of the specific media
@@ -235,6 +222,8 @@ Not implimented
         
 ## Like media [/media/{id}/like]
 
+Not yet implimented
+
 + Parameters
 
     + id: 34632 (required) - Id of the media to like
@@ -250,13 +239,16 @@ Not implimented
 + Response 200 (application/json)
 
 
-## Performance [/performance/{id}]
+## Performance [/performance/{id}{?timeframe}]
+
+Get the number of likes and comments on a media for a given timeframe. The return object contains the timeframe as the key with the properties "likes" and "comments", each containing an array. The array[0] will be the most recent sub-timeframe (meaning hour for day, day for week, week for month). The next index will be the previous sub-timeframe and so on, through the whole timeframe.
 
 + Parameters
 
     + id: 34632 (required) - Id of the specific media
+    + timeframe: day (optional, valid parameters ["day", "week", or "month"]) - The timeframe of stats to get
     
-### Get general performance statistics for media [GET]
+### Get performance statistics for a piece of media [GET]
 
 + Request (application/json)
 
@@ -267,8 +259,8 @@ Not implimented
 + Response 200 (application/json)
 
         {
-            "data": {
-                "likes_per_hour": [
+            "day": {
+                "likes": [
                     "2",
                     "1",
                     "3",
@@ -281,16 +273,32 @@ Not implimented
                     "0",
                     "1"
                 ],
-                "likes_per_day": [
-                    "32",
-                    "532"
+                "comments": [
+                    "1",
+                    "1",
+                    "0",
+                    "2",
+                    "1",
+                    "2",
+                    "4",
+                    "2",
+                    "0",
+                    "0",
+                    "0"
                 ]
             }
         }
         
 
-## Performance [/performance]
+## Performance [/performance{?timeframe}]
 
+Get the current user's total number of follows, likes, and comments for a given timeframe. The return object contains the timeframe as the key with the properties "follows", "likes", and "comments", each containing an array. The array[0] will be the most recent sub-timeframe (meaning hour for day, day for week, week for month). The next index will be the previous sub-timeframe and so on, through the whole timeframe.
+
+
++ Parameters
+
+    + timeframe: day (optional, [day,week,month]) - The timeframe of stats to get
+    
 ### Get general performance statistics [GET]
 
 + Request (application/json)
@@ -302,29 +310,42 @@ Not implimented
 + Response 200 (application/json)
 
         {
-            "data": {
-                "likes_per_hour": [
-                    "2",
-                    "1",
-                    "3",
-                    "6",
-                    "4",
-                    "2",
-                    "42",
-                    "21",
-                    "1",
-                    "0",
-                    "1"
-                ],
-                "likes_per_day": [
+            "week": {
+                "likes": [
                     "32",
-                    "532"
+                    "532",
+                    "32",
+                    "54",
+                    "34",
+                    "12",
+                    "91"
+                ],
+                "comments": [
+                    "21",
+                    "52",
+                    "3",
+                    "41",
+                    "3",
+                    "2",
+                    "9"
+                ],
+                "follows": [
+                    "3",
+                    "32",
+                    "3",
+                    "4",
+                    "3",
+                    "1",
+                    "1"
                 ]
             }
+            
         }
 
 
 ## Global influence [/influence]
+
+Not yet implimented
 
 ### Get user and associated points for mapping influence [GET]
 
@@ -345,16 +366,15 @@ Not implimented
                         "location": {
                             "latitude": 37.778720183610183,
                             "longitude": -122.3962783813477,
-                            "id": "520640",
-                            "street_address": "",
-                            "name": "Le Truc"
                         }
                     }
-                ],
+                ]
             }
         }
         
 ## Media influence [/influence/{id}]
+
+Not yet implimented
 
 + Parameters
 
@@ -372,6 +392,15 @@ Not implimented
 
         {
             "data": {
-            
+                "influenced": [
+                    { 
+                        "id": "1234",
+                        "username": "somename",
+                        "location": {
+                            "latitude": 37.778720183610183,
+                            "longitude": -122.3962783813477,
+                        }
+                    }
+                ]            
             }
         }
