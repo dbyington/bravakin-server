@@ -69,4 +69,30 @@ describe('helper functions', function(){
       user.access_token.should.equal('ACCESS_TOKEN');
     });
   });
+  describe('addPreferences', function(){
+    it('should return valid user with the be like and add tags', async function(){
+      const adds = {like_tags: ['stuff']};
+      const be_like = {be_like: ['Kevin']};
+      let user = await users._helpers.addPreferences(mocks.getUser, adds);
+      user.like_tags.should.include('stuff');
+      user = await users._helpers.addPreferences(mocks.getUser, be_like);
+      user.be_like.should.include('Kevin');
+      const addingMultiplePrefs = {like_tags: ['Tennis'], be_like: ['Travis']};
+      user = await users._helpers.addPreferences(mocks.getUser, addingMultiplePrefs);
+      user.be_like.should.include('Travis');
+      user.like_tags.should.include('Tennis');
+    });
+  });
+
+  describe('removePreferences', function(){
+    it('should return valid user having removed be like and add tags', async function(){
+      const remove = {like_tags: ['adventure']};
+      const be_like = {be_like: ['Godzilla']};
+      let user = await users._helpers.removePreferences(mocks.getUser, remove);
+      user.like_tags.should.not.include('adventure');
+      user = await users._helpers.removePreferences(mocks.getUser, be_like);
+      user.be_like.should.not.include('Godzilla');
+    });
+  });
+
 });
