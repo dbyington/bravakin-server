@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userStatsSchema = new Schema({
-  id: Number,
+  id: {type: Number, ref: 'User'},
   num_followers: Number,
   collected_at: Number
 });

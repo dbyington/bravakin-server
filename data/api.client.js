@@ -96,6 +96,7 @@ class ApiClient {
         const newMedia = new Media({
           id: m['id'],
           title: m['title'],
+          owner: m['user'].id,
           url: m['url'],
           link: m['link'],
           posted_at: m['caption'].created_time,
@@ -111,7 +112,7 @@ class ApiClient {
         id: m['id'],
         likes: m['likes'].count,
         comments: m['comments'].count,
-        timestamp: Date.now()
+        collected_at: Date.now()
       });
       try {
         await newMediaStats.save();
