@@ -19,22 +19,22 @@ beforeEach(async function() {
 describe('Users', function() {
   describe('GET /authorize', function() {
     it('should return the user object', async function(){
-      await users.handleAuthorizeUser(ctx);
+      await users.authorizeUser(ctx);
       ctx.body.should.eql(mocks.authUser);
     });
     it('should return the access token', async function(){
-      await users.handleAuthorizeUser(ctx);
+      await users.authorizeUser(ctx);
       ctx.body.access_token.should.eql(mocks.authUser.access_token);
     });
   });
 
   describe('GET /me', function() {
     it('should return the user object', async function(){
-      await users.handleUserGet(ctx);
+      await users.getUser(ctx);
       ctx.body.should.eql(mocks.getUser);
     });
     it('should not return an access token', async function(){
-      await users.handleUserGet(ctx);
+      await users.getUser(ctx);
       should.not.exist(mocks.access_token);
     });
   });
@@ -47,14 +47,14 @@ describe('Users', function() {
       });
       updatedUser.be_like.filter(el => el !== 'Godzilla');
       ctx.request['body'] = mocks.userUpdate;
-      await users.handleUserUpdate(ctx);
+      await users.updateUser(ctx);
       ctx.body.should.eql(mocks.modifiedUser);
     });
   });
 
   describe('PUT /unauthorize', function() {
     it('should return status code 200: ok', async function(){
-      await users.handleUnauthorizeUser(ctx);
+      await users.unauthorizeUser(ctx);
       ctx.status.should.equal(200);
       ctx.body.should.equal('OK');
     });

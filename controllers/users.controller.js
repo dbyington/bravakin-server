@@ -4,21 +4,21 @@ const User = require('../models/user.model');
 const db = require('../db');
 const UserSerializer = require('../utils/user-serializer');
 
-module.exports.handleAuthorizeUser = async (ctx, next) => {
+module.exports.authorizeUser = async (ctx, next) => {
   const user = await getDatabaseUser(ctx.state.accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.status = 200;
   ctx.body = UserSerializer.serializeWithToken(user);
 };
 
-module.exports.handleUserGet = async (ctx, next) => {
+module.exports.getUser = async (ctx, next) => {
   const user = await getDatabaseUser(ctx.state.accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.status = 200;
   ctx.body = UserSerializer.serialize(user);
 };
 
-module.exports.handleUserUpdate = async (ctx, next) => {
+module.exports.updateUser = async (ctx, next) => {
   let user = await getDatabaseUser(ctx.state.accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   if (ctx.request.body.remove) {
@@ -33,7 +33,7 @@ module.exports.handleUserUpdate = async (ctx, next) => {
   ctx.body = UserSerializer.serialize(user);
 };
 
-module.exports.handleUnauthorizeUser = async (ctx, next) => {
+module.exports.unauthorizeUser = async (ctx, next) => {
   let user = await User.findOne({access_token: ctx.state.accessToken});
   user = await User.findByIdAndUpdate(user._id,
     {$set: {access_token: ''}},

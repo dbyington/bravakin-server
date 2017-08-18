@@ -1,27 +1,27 @@
 'use strict';
 require('dotenv').config();
-const fetch = require('node-fetch');
 const request = require('request-promise');
 
 const User = require('../models/user.model');
 const db = require('../db');
 
-const _getAccessToken = (ctx) => {
+const _getAccessToken = async (ctx) => {
   const form = {
-    client_id = process.env.CLIENT_ID,
-    client_secret = process.env.CLIENT_SECRET,
-    grant_type = 'authorization_code',
-    redirect_uri = 'https://me/authorize',
-    code = ctx.params.code
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    grant_type: 'authorization_code',
+    redirect_uri: 'https://me/authorize',
+    code: ctx.params.code
   };
 
   const postOptions = {
     url: process.env.URL,
     method: 'POST',
     form: form
-  }
-  let responseBody = await request.post(postOptions)
-    .then(data => {
+  };
+
+  let responseBody = await request(postOptions)
+    .then(async data => {
       data = JSON.parse(data);
       if (!data.user.id) ctx.throw(401, 'unauthorized');
 
@@ -38,13 +38,13 @@ const _getAccessToken = (ctx) => {
           }
         );
       } else {
-        const newUser = new User(
+        const newUser = new User({
           access_token: data.access_token,
           id: data.user.id,
           username: data.user.username,
           full_name: data.user.full_name,
           profile_picture: data.user.profile_picture
-        );
+        });
         try {
           user = await newUser.save();
         } catch (e) {
@@ -63,9 +63,9 @@ const _getAccessToken = (ctx) => {
   ctx.body = responseBody;
 }
 
-modules.exports.checkAuth = async (ctx, next) => {
+async function checkAuth (ctx, next) {
   console.log('check for params code and header.authorization');
-  if (ctx.params.code) {
+  if (ctx.params && ctx.params.code) {
     _getAccessToken(ctx);
   } else if (!ctx.header.authorization) {
     ctx.throw(401, 'unauthorized');
@@ -80,3 +80,5 @@ modules.exports.checkAuth = async (ctx, next) => {
   ctx.state.accessToken = accessToken;
   next();
 }
+
+module.exports = checkAuth;
