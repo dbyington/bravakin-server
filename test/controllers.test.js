@@ -19,22 +19,22 @@ beforeEach(async function() {
 describe('Users', function() {
   describe('GET /authorize', function() {
     it('should return the user object', async function(){
-      await users.handleAuthorizeUser(ctx);
+      await users.authorizeUser(ctx);
       ctx.body.should.eql(mocks.authUser);
     });
     it('should return the access token', async function(){
-      await users.handleAuthorizeUser(ctx);
+      await users.authorizeUser(ctx);
       ctx.body.access_token.should.eql(mocks.authUser.access_token);
     });
   });
 
   describe('GET /me', function() {
     it('should return the user object', async function(){
-      await users.handleUserGet(ctx);
+      await users.getUser(ctx);
       ctx.body.should.eql(mocks.getUser);
     });
     it('should not return an access token', async function(){
-      await users.handleUserGet(ctx);
+      await users.getUser(ctx);
       should.not.exist(mocks.access_token);
     });
   });
@@ -47,14 +47,14 @@ describe('Users', function() {
       });
       updatedUser.be_like.filter(el => el !== 'Godzilla');
       ctx.request['body'] = mocks.userUpdate;
-      await users.handleUserUpdate(ctx);
+      await users.updateUser(ctx);
       ctx.body.should.eql(mocks.modifiedUser);
     });
   });
 
   describe('PUT /unauthorize', function() {
     it('should return status code 200: ok', async function(){
-      await users.handleUnauthorizeUser(ctx);
+      await users.unauthorizeUser(ctx);
       ctx.status.should.equal(200);
       ctx.body.should.equal('OK');
     });
@@ -69,4 +69,30 @@ describe('helper functions', function(){
       user.access_token.should.equal('ACCESS_TOKEN');
     });
   });
+  describe('addPreferences', function(){
+    it('should return valid user with the be like and add tags', async function(){
+      const adds = {like_tags: ['stuff']};
+      const be_like = {be_like: ['Kevin']};
+      let user = await users._helpers.addPreferences(mocks.getUser, adds);
+      user.like_tags.should.include('stuff');
+      user = await users._helpers.addPreferences(mocks.getUser, be_like);
+      user.be_like.should.include('Kevin');
+      const addingMultiplePrefs = {like_tags: ['Tennis'], be_like: ['Travis']};
+      user = await users._helpers.addPreferences(mocks.getUser, addingMultiplePrefs);
+      user.be_like.should.include('Travis');
+      user.like_tags.should.include('Tennis');
+    });
+  });
+
+  describe('removePreferences', function(){
+    it('should return valid user having removed be like and add tags', async function(){
+      const remove = {like_tags: ['adventure']};
+      const be_like = {be_like: ['Godzilla']};
+      let user = await users._helpers.removePreferences(mocks.getUser, remove);
+      user.like_tags.should.not.include('adventure');
+      user = await users._helpers.removePreferences(mocks.getUser, be_like);
+      user.be_like.should.not.include('Godzilla');
+    });
+  });
+
 });
