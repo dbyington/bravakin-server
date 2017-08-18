@@ -8,6 +8,7 @@ const userSchema = new Schema({
   profile_picture: String,
   be_like: Array,
   like_tags: Array,
+  followers: Array,
   access_token: String
 });
 

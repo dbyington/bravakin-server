@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const mediaStatsSchema = new Schema({
-  id: Number,
+  id: String,
   likes: Number,
   comments: Number,
-  timestamp: Date
+  collected_at: Number
 });
 
 const MediaStats = mongoose.model('MediaStats', mediaStatsSchema);
