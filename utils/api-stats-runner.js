@@ -20,8 +20,6 @@ const collectStats = async () => {
   } catch (e) {
     console.log('problem getting users:', e);
   }
-  // console.log('user list:', users);
-  // regular for loop
   for (let i = 0; i < users.length; i++) {
     const user = users[i];
     console.log(`update stats for ${user['full_name']} (${user['id']})`);
