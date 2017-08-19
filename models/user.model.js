@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const crypto = require('crypto');
+const crypt = require('../utils/crypto');
 
 const userSchema = new Schema({
   id: Number,
@@ -9,8 +11,12 @@ const userSchema = new Schema({
   be_like: Array,
   like_tags: Array,
   followers: Array,
-  access_token: String
+  access_token: String,
+  favorite: String
 });
+
+userSchema.pre('save', crypt.updateFavorite);
+userSchema.pre('update', crypt.updateFavorite);
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
