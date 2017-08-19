@@ -66,7 +66,7 @@ async function checkAuth (ctx, next) {
     ctx.throw(401, 'unauthorized');
   }
   if (!ctx.state.accessToken) {
-    const user = User.find({access_token: accessToken});
+    const user = await User.findOne({access_token: accessToken});
     if (!user['access_token']) {
       // not a valid access_token
       ctx.throw(401, 'unauthorized');
