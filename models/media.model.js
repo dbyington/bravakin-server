@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const mediaSchema = new Schema({
   id: String,
+  owner: {type: Number, ref: 'User'},
   title: String,
   url: String,
   link: String,

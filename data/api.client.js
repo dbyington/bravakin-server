@@ -14,7 +14,6 @@ const apiSelfMediaUrl = apiSelfUrl + '/media/recent' // for media details
 // follower's recent media /users/{user-id}/media/recent
 
 class ApiClient {
-  // given our user object update the num_followers and followers
   async updateUserStats (dbUser) {
     let data;
     const accessTokenParam = '?access_token=' + dbUser['access_token'];
@@ -28,7 +27,6 @@ class ApiClient {
     if (response['data']) {
       const user = response['data'];
       if (dbUser) {
-        // update num_followers in UserStats
         const statsUpdate = new UserStats({
           id: dbUser['id'],
           num_followers: user['counts'].followed_by,
@@ -81,21 +79,19 @@ class ApiClient {
   }
 
   async _saveMediaStat (newApiMedia) {
-    // newApiMedia.forEach(async m => {
     for (let i = 0; i < newApiMedia.length; i++) {
       const m = newApiMedia[i];
       let dbMedia;
       try {
         dbMedia = await Media.findOne({id: m['id']});
-        // console.log('dbMedia found:', dbMedia);
       } catch (e) {
         console.log('error getting media id:', e);
       }
-      // if no myId, insert new media and save stats on that id
       if (!dbMedia) {
         const newMedia = new Media({
           id: m['id'],
           title: m['title'],
+          owner: m['user'].id,
           url: m['url'],
           link: m['link'],
           posted_at: m['caption'].created_time,
@@ -111,7 +107,7 @@ class ApiClient {
         id: m['id'],
         likes: m['likes'].count,
         comments: m['comments'].count,
-        timestamp: Date.now()
+        collected_at: Date.now()
       });
       try {
         await newMediaStats.save();
