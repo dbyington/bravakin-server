@@ -5,15 +5,13 @@ const request = require('request-promise');
 
 const UserSerializer = require('../utils/user-serializer');
 const User = require('../models/user.model');
-const db = require('../db');
 
 async function _getAccessToken (ctx) {
-
   const form = {
     client_id: process.env.CLIENT_ID,
     client_secret: process.env.CLIENT_SECRET,
     grant_type: 'authorization_code',
-    redirect_uri: 'http://localhost:3000/authorize',
+    redirect_uri: process.env.OAUTH_REDIRECT_URL,
     code: ctx.query.code
   };
 
@@ -54,7 +52,7 @@ async function _getAccessToken (ctx) {
       ctx.state.accessToken = user.access_token;
       return user;
     })
-    .catch( err => {
+    .catch(err => {
       ctx.throw(401, 'unauthorized sucka', err);
     });
   ctx.status = 200;
