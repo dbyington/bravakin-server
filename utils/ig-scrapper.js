@@ -23,13 +23,17 @@ const postLinkSelector = '._mck9w a'
 const postLocationSelector = '._q8ysx'
 const postHeaderSelector = '._7b8eu'
 
+const tagSearchSelector = '._cmdpi ._mck9w a'
+const tagSearchLinkSelector = `${tagSearchSelector} a`
+const tagSearchImageSelector = `${tagSearchSelector} img`
+
 class InstagramScrapper {
   constructor (username, password, cookies) {
     this.username = username
     this.password = password
     this.cookies = cookies
     this.result = {}
-    this.nightmare = Nightmare({ show: false })
+    this.nightmare = Nightmare({ show: true })
     if (cookies) this.nightmare.cookies.set(cookies)
   }
 
@@ -47,6 +51,37 @@ class InstagramScrapper {
       this.end()
       throw e
     }
+  }
+
+  async getLikeableMediaFromHashtag (hashtag) {
+    if (!hashtag) throw new Error('Hashtag not provided.')
+    const url = `${baseURL}/explore/tags/${hashtag}/`
+    this.nightmare
+      .goto(url)
+      .wait('._jzhdd')
+      .evaluate((tagSearchLinkSelector, tagSearchImageSelector) => {
+        console.log('evaluate likeable media');
+        let links = document.querySelectorAll(tagSearchLinkSelector);
+        links = Array.prototype.slice.call(links, 9);
+        let images = document.querySelectorAll(tagSearchImageSelector);
+        images = Array.prototype.slice.call(images, 9);
+        return images.map((image, index) => {
+          console.log(image);
+          const srcset = image.getAttribute('srcset').split(',')
+          console.log(srcset);
+          const imageURL = srcset[srcset.length - 1].split(' ')[0]
+          return {
+            url: links[index].getAttribute('href'),
+            imageURL
+          }
+        })
+      }, tagSearchLinkSelector, tagSearchImageSelector)
+      .then(result => console.log(result))
+      .catch(e => this.nightmare.end())
+  }
+
+  async getLikeableMediaFromUsername () {
+
   }
 
   end () {
@@ -163,5 +198,7 @@ class InstagramScrapper {
     })
   }
 }
+
+(new InstagramScrapper()).getLikeableMediaFromHashtag('goldenhour')
 
 module.exports = InstagramScrapper
