@@ -3,10 +3,11 @@ const Schema = mongoose.Schema;
 
 const mediaSchema = new Schema({
   id: String,
+  owner: Number,
   title: String,
   url: String,
   link: String,
-  posted_at: Number,
+  posted_at: Date,
   tags: Array
 });
 

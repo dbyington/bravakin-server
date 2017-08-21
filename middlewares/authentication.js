@@ -53,6 +53,7 @@ const _getAccessToken = async (ctx) => {
       }
 
       ctx.state.accessToken = user.access_token;
+      ctx.state.userId = user.id;
       return user;
     })
     .catch( err => {
@@ -64,7 +65,6 @@ const _getAccessToken = async (ctx) => {
 }
 
 async function checkAuth (ctx, next) {
-  console.log('check for params code and header.authorization');
   if (ctx.params && ctx.params.code) {
     _getAccessToken(ctx);
   } else if (!ctx.header.authorization) {
@@ -72,12 +72,13 @@ async function checkAuth (ctx, next) {
   }
   // made it through the gaunlet, check the access_token
   const accessToken = ctx.header.authorization.split(' ')[1];
-  const user = User.find({access_token: accessToken});
+  const user = await User.findOne({access_token: accessToken});
   if (!user['access_token']) {
     // not a valid access_token
     ctx.throw(401, 'unauthorized');
   }
   ctx.state.accessToken = accessToken;
+  ctx.state.userId = user.id;
   next();
 }
 
