@@ -25,9 +25,9 @@ const tagSearchSelector = '._cmdpi ._mck9w'
 const tagSearchLinkSelector = `${tagSearchSelector} a`
 const tagSearchImageSelector = `${tagSearchSelector} img`
 
-class InstagramScrapper {
+class InstagramScraper {
   /**
-   * Gets a new InstagramScrapper.
+   * Gets a new InstagramScraper.
    * @constructor
    * @param {string} username - The username to work with.
    * @param {string} password - The user's password.
@@ -259,4 +259,4 @@ class InstagramScrapper {
   }
 }
 
-module.exports = InstagramScrapper
+module.exports = InstagramScraper;

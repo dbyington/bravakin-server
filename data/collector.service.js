@@ -5,15 +5,15 @@ const User = require('../models/user.model');
 const UserStats = require('../models/user-stats.model');
 const Media = require('../models/media.model');
 const MediaStats = require('../models/media-stats.model');
-const InstagramScrapper = require('../utils/ig-scrapper');
+const InstagramScraper = require('../utils/ig-scraper');
 
 class Collector {
   async scrapeFollowersLocation () {
     try {
       const users = await User.find()
       for (const user of users) {
-        const igScrapper = new InstagramScrapper(user.username, user.getRawPassword());
-        const result = await igScrapper.scrapeFollowers();
+        const igScraper = new InstagramScraper(user.username, user.getRawPassword());
+        const result = await igScraper.scrapeFollowers();
         // Save the result
       };
     } catch (e) {
