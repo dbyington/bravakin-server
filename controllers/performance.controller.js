@@ -187,14 +187,3 @@ const _getMediaStats = async (mediaId, timeframe) => {
   const stats = await _getAggregateStats(MediaStats, timeframe, mediaId);
   return stats;
 };
-
-const go = async () => {
-  let ctx;
-  // console.log(await _getAggregateStats(MediaStats, 'day', '1584008889002932090_5407090550'));
-  // console.log(await _getAggregateStats(MediaStats, 'day', '1586015531470970987_5407090550'));
-  ctx = {query: {timeframe: 'day'}, state: {userId: 5407090550, accessToken: '5407090550.38553e7.e93c91886f1d4d59b4962f0e5cedc8ba'}};
-  await module.exports.userStats(ctx);
-  ctx = {body: {}, query: {timeframe: 'day'}, params: {id: '1586015531470970987_5407090550'}, state: {userId: 5407090550, accessToken: '5407090550.38553e7.e93c91886f1d4d59b4962f0e5cedc8ba'}};
-  await module.exports.mediaStats(ctx);
-}
-go();
