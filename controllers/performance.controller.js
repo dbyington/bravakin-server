@@ -1,7 +1,5 @@
 'use strict';
 
-const db = require('../db');
-
 const User = require('../models/user.model');
 const UserStats = require('../models/user-stats.model');
 const Media = require('../models/media.model');
