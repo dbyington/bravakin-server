@@ -145,15 +145,14 @@ Not implimented
         }
 
 
-## Get media by tag [/tags/{tag_name}{?offset,size}]
+## Get media by tag [/tags/{tag_name}]
 
-Not implimented
+Status: Implementation pending
+Get 20 pieces of media to like by hashtag
 
 + Parameters
 
     + tag_name: "moto" (required) - Tag name to search
-    + offset: 60 (optional, number) - result offset
-    + size: 60 (optional, number) - number of results to retrieve
 
 ### Get media [GET]
 
@@ -169,31 +168,48 @@ Not implimented
     
             {
                 "data": [
-                    {
-                        "id": "424242",
-                        "tags": "["moto"]",
-                        "url": "",
-                        "link": "http://instagr.am/z/B/",
-                        "post_user": {
-                            "id": "1234",
-                            "username": "",
-                            "full_name": "",
-                            "profile_picture": "http://"
-                    },
-                    {
-                        "id": "53",
-                        "tags": "["moto"]",
-                        "url": "",
-                        "link": "http://instagr.am/a/B/",
-                        "post_user": {
-                            "id": "514",
-                            "username": "",
-                            "full_name": "",
-                            "profile_picture": "http://"
-                    }
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"},
+                    { "imageUrl": "https://unsplash.it/1536/1024/?random", "postUrl": "%2Fp%2FBX2cAjVlBN5%2F"}
                 ]
             }
             
+
+## Like media [/media/{url_path}/like]
+
+Status: Implementation pending
+Like the media at url path (url encoded)
+
++ Parameters
+
+    + url_path: %2Fp%2FBX2cAjVlBN5%2F (required) - url encoded path to the media to like
+    
+### Like a piece of media [PUT]
+
++ Requset (application/json)
+
+    + Headers
+    
+            Authorization: Bearer ACCESS_TOKEN
+            
++ Response 200 (application/json)
 
 
 ## Specific media [/media/{id}]
