@@ -23,7 +23,7 @@ const postLinkSelector = '._mck9w a'
 const postLocationSelector = '._q8ysx'
 const postHeaderSelector = '._7b8eu'
 
-const tagSearchSelector = '._cmdpi ._mck9w a'
+const tagSearchSelector = '._cmdpi ._mck9w'
 const tagSearchLinkSelector = `${tagSearchSelector} a`
 const tagSearchImageSelector = `${tagSearchSelector} img`
 
@@ -58,18 +58,14 @@ class InstagramScrapper {
     const url = `${baseURL}/explore/tags/${hashtag}/`
     this.nightmare
       .goto(url)
-      .wait('._jzhdd')
+      .wait(tagSearchSelector)
       .evaluate((tagSearchLinkSelector, tagSearchImageSelector) => {
-        console.log('evaluate likeable media');
         let links = document.querySelectorAll(tagSearchLinkSelector);
         links = Array.prototype.slice.call(links, 9);
         let images = document.querySelectorAll(tagSearchImageSelector);
         images = Array.prototype.slice.call(images, 9);
         return images.map((image, index) => {
-          console.log(image);
-          const srcset = image.getAttribute('srcset').split(',')
-          console.log(srcset);
-          const imageURL = srcset[srcset.length - 1].split(' ')[0]
+          const imageURL = image.getAttribute('src')
           return {
             url: links[index].getAttribute('href'),
             imageURL
