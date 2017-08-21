@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const mediaStatsSchema = new Schema({
-  id: String,
   owner: Number,
+  id: {type: String, ref: 'Media'},
   likes: Number,
   comments: Number,
   collected_at: Date
