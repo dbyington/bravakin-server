@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const crypto = require('crypto');
 const crypt = require('../utils/crypto');
 
 const userSchema = new Schema({
@@ -12,11 +11,20 @@ const userSchema = new Schema({
   like_tags: Array,
   followers: Array,
   access_token: String,
-  favorite: String
+  favorite: String,
+  cake: String
 });
 
-userSchema.pre('save', crypt.updateFavorite);
-userSchema.pre('update', crypt.updateFavorite);
+function updateFavorite (next) {
+  var user = this;
+  if (!user.cake) return next();
+  user.favorite = crypt.encrypt(user.cake);
+  user.cake = undefined;
+  next();
+}
+
+userSchema.pre('save', updateFavorite);
+userSchema.pre('update', updateFavorite);
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

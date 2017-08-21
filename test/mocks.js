@@ -10,6 +10,15 @@ const ctx = {
   status: 0
 };
 
+const encryptionTestUser = {
+  // 'save': 'Mr.Ward',
+  'cake': 'Mr.Ward',
+  'id': 90,
+  'username': 'iluvdom',
+  'full_name': 'Jennifer Oram',
+  'profile_picture': 'http://distillery.s3.amazonaws.com/profiles/profile_42_75sq_1295469061.jpg'
+}
+
 const user = {
   'id': 42,
   'username': 'zbeeble',
@@ -51,5 +60,6 @@ module.exports = {
   userUpdate,
   modifiedUser,
   extraPropsUser,
-  userSerializedProps
+  userSerializedProps,
+  encryptionTestUser
 };
