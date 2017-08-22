@@ -27,7 +27,6 @@ const limits = {
 module.exports.userStats = async (ctx, next) => {
   let user;
   const timeframe = ctx['query'].timeframe;
-  console.log(ctx['state']);
   try {
     user = await User.findOne({id: ctx['state'].userId});
   } catch (e) {
@@ -37,7 +36,6 @@ module.exports.userStats = async (ctx, next) => {
   const stats = await _getUserLikeCommentStats(user['id'], timeframe);
   const combinedStats = _combineUserStats(followers, stats);
   const statsObj = { timeframe: timeframe, stat_type: 'user', id: user['id'], stats: combinedStats }
-  console.log('USER STATS:\n', statsObj);
 };
 
 module.exports.mediaStats = async (ctx, next) => {
@@ -45,7 +43,6 @@ module.exports.mediaStats = async (ctx, next) => {
   const mediaId = ctx['params'].id;
   const stats = await _getMediaStats(mediaId, timeframe);
   const statsObj = { timeframe: timeframe, stat_type: 'media', id: mediaId, stats: stats }
-  console.log('MEDIA STATS:\n', statsObj);
   ctx.status = 200;
   ctx.body = statsObj;
 }
@@ -72,7 +69,8 @@ async function _getAggregateStats (model, timeframe, id, raw) {
   };
   let group = {
     _id: `$${timeframe}`,
-    timeframe: { $first: `${limits[timeframe].label}` }
+    timeframe: { $first: `${limits[timeframe].label}` },
+    date: { $first: '$collected_at' }
   };
   if (modelType && modelType.num_followers !== undefined) {
     project['num_followers'] = 1;
@@ -126,9 +124,7 @@ const _mapStats = (ref, results) => {
     const newObj = {};
     let idxRef;
 
-    if (idx === nowIdx) newObj['now'] = true;
     if (Number(res['_id']) === Number(ref[0]['_id']) + 1) {
-      // newObj['now'] = true;
       keys.forEach(k => {
         newObj[k] = typeof res[k] === 'number' ? res[k] - ref[0][k] : res[k];
       });
@@ -187,14 +183,3 @@ const _getMediaStats = async (mediaId, timeframe) => {
   const stats = await _getAggregateStats(MediaStats, timeframe, mediaId);
   return stats;
 };
-
-const go = async () => {
-  let ctx;
-  // console.log(await _getAggregateStats(MediaStats, 'day', '1584008889002932090_5407090550'));
-  // console.log(await _getAggregateStats(MediaStats, 'day', '1586015531470970987_5407090550'));
-  ctx = {query: {timeframe: 'day'}, state: {userId: 5407090550, accessToken: '5407090550.38553e7.e93c91886f1d4d59b4962f0e5cedc8ba'}};
-  await module.exports.userStats(ctx);
-  ctx = {body: {}, query: {timeframe: 'day'}, params: {id: '1586015531470970987_5407090550'}, state: {userId: 5407090550, accessToken: '5407090550.38553e7.e93c91886f1d4d59b4962f0e5cedc8ba'}};
-  await module.exports.mediaStats(ctx);
-}
-go();
