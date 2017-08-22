@@ -2,7 +2,7 @@ const router = require('koa-router')();
 
 router
   .get('/authorize', function (ctx, next) {
-    ctx.body = 'Hello Login!';
+    ctx.body = ctx.body;
   })
   .get('/me/activity', function (ctx, next) {
     ctx.body = 'Hello activity!';
