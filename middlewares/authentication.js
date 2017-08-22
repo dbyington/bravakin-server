@@ -50,6 +50,7 @@ async function _getAccessToken (ctx) {
         }
       }
       ctx.state.accessToken = user.access_token;
+      ctx.state.userId = user.id;
       return user;
     })
     .catch(err => {
@@ -60,6 +61,7 @@ async function _getAccessToken (ctx) {
 }
 
 async function checkAuth (ctx, next) {
+
   if (ctx.query && ctx.query.code) {
     await _getAccessToken(ctx);
   } else if (!ctx.header.authorization) {

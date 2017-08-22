@@ -7,7 +7,7 @@ const mediaSchema = new Schema({
   title: String,
   url: String,
   link: String,
-  posted_at: Number,
+  posted_at: Date,
   tags: Array
 });
 

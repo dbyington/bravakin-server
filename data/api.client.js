@@ -30,7 +30,7 @@ class ApiClient {
         const statsUpdate = new UserStats({
           id: dbUser['id'],
           num_followers: user['counts'].followed_by,
-          collected_at: Date.now()
+          collected_at: new Date()
         });
         try {
           await statsUpdate.save();
@@ -51,7 +51,7 @@ class ApiClient {
 
   async saveMediaStats (dbUser) {
     const newApiMedia = await this._getMedia(dbUser);
-    await this._saveMediaStat(newApiMedia);
+    await this._saveMediaStat(newApiMedia, dbUser);
   }
 
   async _getMedia (dbUser) {
@@ -78,23 +78,25 @@ class ApiClient {
     return arr;
   }
 
-  async _saveMediaStat (newApiMedia) {
+  async _saveMediaStat (newApiMedia, dbUser) {
     for (let i = 0; i < newApiMedia.length; i++) {
       const m = newApiMedia[i];
       let dbMedia;
       try {
         dbMedia = await Media.findOne({id: m['id']});
+        Media.update({id: m['id']}, {$set: {owner: dbUser['id']}});
       } catch (e) {
         console.log('error getting media id:', e);
       }
       if (!dbMedia) {
         const newMedia = new Media({
           id: m['id'],
+          owner: dbUser['id'],
           title: m['title'],
           owner: m['user'].id,
           url: m['url'],
           link: m['link'],
-          posted_at: m['caption'].created_time,
+          posted_at: new Date(m['caption'].created_time * 1000),
           tags: m['tags']
         });
         try {
@@ -105,9 +107,10 @@ class ApiClient {
       }
       const newMediaStats = new MediaStats({
         id: m['id'],
+        owner: dbUser['id'],
         likes: m['likes'].count,
         comments: m['comments'].count,
-        collected_at: Date.now()
+        collected_at: new Date()
       });
       try {
         await newMediaStats.save();
