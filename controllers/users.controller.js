@@ -1,7 +1,6 @@
 'use strict';
 
 const User = require('../models/user.model');
-const db = require('../db');
 const UserSerializer = require('../utils/user-serializer');
 
 module.exports.authorizeUser = async (ctx, next) => {
