@@ -1,4 +1,5 @@
 const mocks = require('./mocks.js');
+const db = require('../db');
 const User = require('../models/user.model');
 const expect = require('chai').expect;
 const should = require('chai').should;
