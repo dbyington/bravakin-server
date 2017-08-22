@@ -29,7 +29,7 @@ module.exports.updateUser = async (ctx, next) => {
   // save
   if (ctx.request.body.save) {
     user.cake = ctx.request.body.save;
-    user = await user.save
+    user = await user.save()
   }
   ctx.status = 200;
   user = await getDatabaseUser(ctx.state.accessToken);
