@@ -26,6 +26,11 @@ module.exports.updateUser = async (ctx, next) => {
   if (ctx.request.body.add) {
     user = await addPreferences(user, ctx.request.body.add);
   }
+  // save
+  if (ctx.request.body.save) {
+    user.cake = ctx.request.body.save;
+    user = await user.save();
+  }
   ctx.status = 200;
   user = await getDatabaseUser(ctx.state.accessToken);
   if (user.error) ctx.throw(user.code, user.error);
