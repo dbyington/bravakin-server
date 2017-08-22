@@ -61,12 +61,13 @@ async function _getAccessToken (ctx) {
 }
 
 async function checkAuth (ctx, next) {
-
   if (ctx.query && ctx.query.code) {
     await _getAccessToken(ctx);
   } else if (!ctx.header.authorization) {
     ctx.throw(401, 'unauthorized');
   }
+  const authData = ctx.header.authorization.split(' ');
+  const accessToken = authData[1];
   if (!ctx.state.accessToken) {
     const user = await User.findOne({access_token: accessToken});
     if (!user['access_token']) {
