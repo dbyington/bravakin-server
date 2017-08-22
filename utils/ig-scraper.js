@@ -13,17 +13,26 @@ const passwordInputSelector = 'input[name="password"]'
 const mainFeedSelector = '#mainFeed'
 const mainArticleSelector = '._mesn5'
 const loginButtonSelector = '._qv64e'
-const profileButtonSelector = 'a._8scx2'
 const followersLinkSelector = '._t98z6'
 const followerLISelector = '._2g7d5'
-const closeModalButtonSelector = '._dcj9f'
 
 const numPostsSelector = '._fd86t'
 const postLinkSelector = '._mck9w a'
 const postLocationSelector = '._q8ysx'
 const postHeaderSelector = '._7b8eu'
 
-class InstagramScrapper {
+const tagSearchSelector = '._cmdpi ._mck9w'
+const tagSearchLinkSelector = `${tagSearchSelector} a`
+const tagSearchImageSelector = `${tagSearchSelector} img`
+
+class InstagramScraper {
+  /**
+   * Gets a new InstagramScraper.
+   * @constructor
+   * @param {string} username - The username to work with.
+   * @param {string} password - The user's password.
+   * @param {Array} [cookies] - The cookies to be set on the browser (for caching purposes).
+   */
   constructor (username, password, cookies) {
     this.username = username
     this.password = password
@@ -33,6 +42,10 @@ class InstagramScrapper {
     if (cookies) this.nightmare.cookies.set(cookies)
   }
 
+  /**
+   * scrape the first page of followers of the current user.
+   * @returns {Array} An object containing the info of the user (profile + followers)
+   */
   async scrapeFollowers () {
     try {
       await this._signIn()
@@ -49,6 +62,82 @@ class InstagramScrapper {
     }
   }
 
+  /**
+   * Returns an array of likeable media related to a hashtag.
+   * @param {string} hashtag - The hashtag to use on media search.
+   * @returns {Array} An array of media (with link and imageURL) that can be liked.
+   */
+  async getLikeableMediaFromHashtag (hashtag) {
+    if (!hashtag) throw new Error('Hashtag not provided.')
+    const url = `${baseURL}/explore/tags/${hashtag}/`
+    this.nightmare
+      .goto(url)
+      .wait(tagSearchSelector)
+      .evaluate((tagSearchLinkSelector, tagSearchImageSelector) => {
+        let links = document.querySelectorAll(tagSearchLinkSelector);
+        links = Array.prototype.slice.call(links, 9);
+        let images = document.querySelectorAll(tagSearchImageSelector);
+        images = Array.prototype.slice.call(images, 9);
+        return images.map((image, index) => {
+          const imageURL = image.getAttribute('src')
+          return {
+            url: links[index].getAttribute('href'),
+            imageURL
+          }
+        })
+      }, tagSearchLinkSelector, tagSearchImageSelector)
+      .then(result => {
+        this.end();
+        return result;
+      })
+      .catch(e => this.nightmare.end())
+  }
+
+  /**
+   * Returns an array of likeable media related to a user.
+   * @param {string} username - The user to use on media search.
+   * @returns {Array} An array of media (with link and imageURL) that can be liked.
+   */
+  async getLikeableMediaFromUsername (username) {
+    await this._signIn();
+    const followers = await this._getFollowersFromUsername(username)
+    console.log(followers);
+
+    const media = []
+    for (let i = 0; i < followers.length; i++) {
+      const follower = followers[i]
+      const url = `${baseURL}/${follower}/`
+      await this.nightmare
+        .goto(url)
+        .wait(mainArticleSelector)
+        .evaluate((tagSearchLinkSelector, tagSearchImageSelector) => {
+          let links = document.querySelectorAll(tagSearchLinkSelector);
+          links = Array.prototype.slice.call(links, 9);
+          let images = document.querySelectorAll(tagSearchImageSelector);
+          images = Array.prototype.slice.call(images, 9);
+          return images.map((image, index) => {
+            const imageURL = image.getAttribute('src')
+            return {
+              url: links[index].getAttribute('href'),
+              imageURL
+            }
+          })
+        }, tagSearchLinkSelector, tagSearchImageSelector)
+        .then(result => {
+          media.push(result);
+        })
+        .catch(e => {
+          console.log(e);
+        })
+    }
+
+    this.end();
+    return media;
+  }
+
+  /**
+   * Ends the current browser session.
+   */
   end () {
     this.nightmare.end()
   }
@@ -97,23 +186,11 @@ class InstagramScrapper {
   }
 
   async _scrapeFollowers () {
-    const url = `${baseURL}/${this.username}/followers/`;
-    console.log('\tAccessing:', url);
-    await this.nightmare
-      .evaluate(followersLinkSelector => {
-        return document.querySelectorAll(followersLinkSelector)[1].click()
-      }, followersLinkSelector)
-      .wait(followerLISelector)
-      .evaluate(followerLISelector => {
-        const names = document.querySelectorAll(followerLISelector);
-        // TODO: Apply some pagination
-        return Array.prototype.map.call(names, name => name.innerHTML)
-      }, followerLISelector)
-      .then(parsed => {
-        Object.assign(this.result.user, {
-          followers: parsed
-        })
-      })
+    const parsed = await this._getFollowersFromUsername(this.username)
+
+    Object.assign(this.result.user, {
+      followers: parsed
+    })
 
     // Add geolocation
     for (let i = 0; i < this.result.user.followers.length; i++) {
@@ -154,6 +231,24 @@ class InstagramScrapper {
     }
   }
 
+  async _getFollowersFromUsername (username) {
+    if (!username) throw new Error('No username provided.')
+
+    const url = `${baseURL}/${username}/`;
+    console.log('\tAccessing:', url);
+    return this.nightmare
+      .goto(url)
+      .evaluate(followersLinkSelector => {
+        return document.querySelectorAll(followersLinkSelector)[1].click()
+      }, followersLinkSelector)
+      .wait(followerLISelector)
+      .evaluate(followerLISelector => {
+        const names = document.querySelectorAll(followerLISelector);
+        // TODO: Apply some pagination
+        return Array.prototype.map.call(names, name => name.innerHTML)
+      }, followerLISelector)
+  }
+
   _evalLocation (location) {
     return new Promise((resolve, reject) => {
       googleMapsClient.geocode({ address: location }, (err, response) => {
@@ -164,4 +259,4 @@ class InstagramScrapper {
   }
 }
 
-module.exports = InstagramScrapper
+module.exports = InstagramScraper;
