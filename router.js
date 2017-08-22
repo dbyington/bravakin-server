@@ -1,4 +1,5 @@
 const router = require('koa-router')();
+const performanceController = require('./controllers/performance.controller');
 const userController = require('./controllers/users.controller');
 
 router
@@ -17,12 +18,8 @@ router
   .get('/media/:id', function (ctx, next) {
     ctx.body = 'Hello media id!';
   })
-  .get('/performance/:id', function (ctx, next) {
-    ctx.body = 'Hello performance id!';
-  })
-  .get('/performance', function (ctx, next) {
-    ctx.body = 'Hello performance!';
-  })
+  .get('/performance/:id', performanceController.mediaStats)
+  .get('/performance', performanceController.userStats)
   .get('/influence/:id', function (ctx, next) {
     ctx.body = 'Hello influence id!';
   })
