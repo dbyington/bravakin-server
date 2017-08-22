@@ -1,9 +1,7 @@
 'use strict';
 require('dotenv').config();
 const request = require('request-promise');
-
 const User = require('../models/user.model');
-const db = require('../db');
 
 const _getAccessToken = async (ctx) => {
   const form = {
@@ -30,9 +28,9 @@ const _getAccessToken = async (ctx) => {
       let user = await User.findOne({id: data.user.id});
       if (user.id) { // user found, update the access_token
         user = await User.findByIdAndUpdate(user._id,
-          { $set: {access_token: data.access_token}},
+          {$set: {access_token: data.access_token}},
           {new: true},
-          function(err, d) {
+          function (err, d) {
             if (err) ctx.throw(500, JSON.stringify({error: {status: 500, error_message: err}}));
             return d;
           }
@@ -55,7 +53,7 @@ const _getAccessToken = async (ctx) => {
       ctx.state.accessToken = user.access_token;
       return user;
     })
-    .catch( err => {
+    .catch(err => {
       ctx.throw(401, 'unauthorized');
     });
 
