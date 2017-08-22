@@ -2,8 +2,8 @@
 
 require('dotenv').config();
 const request = require('request-promise');
-
 const UserSerializer = require('../utils/user-serializer');
+
 const User = require('../models/user.model');
 
 async function _getAccessToken (ctx) {
@@ -54,7 +54,8 @@ async function _getAccessToken (ctx) {
       return user;
     })
     .catch(err => {
-      ctx.throw(401, 'unauthorized sucka', err);
+      ctx.throw(401, 'unauthorized');
+
     });
   ctx.status = 200;
   ctx.body = UserSerializer.serializeWithToken(responseBody);

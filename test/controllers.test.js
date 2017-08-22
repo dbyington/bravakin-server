@@ -3,37 +3,35 @@
 const should = require('chai').should();
 const mocks = require('./mocks');
 const users = require('../controllers/users.controller');
-const db = require('../db');
 const User = require('../models/user.model');
 
 let ctx;
 
-beforeEach(async function() {
+beforeEach(async function () {
   ctx = Object.assign({}, mocks.ctx, {state: {accessToken: 'ACCESS_TOKEN'}})
   await User.remove({id: 42});
   const user = new User(mocks.authUser);
   await user.save();
 });
 
-
-describe('Users', function() {
-  describe('GET /authorize', function() {
-    it('should return the user object', async function(){
+describe('Users', function () {
+  describe('GET /authorize', function () {
+    it('should return the user object', async function () {
       await users.authorizeUser(ctx);
       ctx.body.should.eql(mocks.authUser);
     });
-    it('should return the access token', async function(){
+    it('should return the access token', async function () {
       await users.authorizeUser(ctx);
       ctx.body.access_token.should.eql(mocks.authUser.access_token);
     });
   });
 
-  describe('GET /me', function() {
-    it('should return the user object', async function(){
+  describe('GET /me', function () {
+    it('should return the user object', async function () {
       await users.getUser(ctx);
       ctx.body.should.eql(mocks.getUser);
     });
-    it('should not return an access token', async function(){
+    it('should not return an access token', async function () {
       await users.getUser(ctx);
       should.not.exist(mocks.access_token);
     });
@@ -52,8 +50,8 @@ describe('Users', function() {
     });
   });
 
-  describe('PUT /unauthorize', function() {
-    it('should return status code 200: ok', async function(){
+  describe('PUT /unauthorize', function () {
+    it('should return status code 200: ok', async function () {
       await users.unauthorizeUser(ctx);
       ctx.status.should.equal(200);
       ctx.body.should.equal('OK');
@@ -61,21 +59,22 @@ describe('Users', function() {
   });
 });
 
-describe('helper functions', function(){
-  describe('getDatabaseUser', function(){
-    it('should return valid user with valid access_token', async function(){
+describe('helper functions', function () {
+  describe('getDatabaseUser', function () {
+    it('should return valid user with valid access_token', async function () {
       const user = await users._helpers.getDatabaseUser(ctx.state.accessToken);
       user.id.should.equal(42);
       user.access_token.should.equal('ACCESS_TOKEN');
     });
   });
-  describe('addPreferences', function(){
-    it('should return valid user with the be like and add tags', async function(){
+
+  describe('addPreferences', function () {
+    it('should return valid user with the be like and add tags', async function () {
       const adds = {like_tags: ['stuff']};
-      const be_like = {be_like: ['Kevin']};
+      const beLike = {be_like: ['Kevin']};
       let user = await users._helpers.addPreferences(mocks.getUser, adds);
       user.like_tags.should.include('stuff');
-      user = await users._helpers.addPreferences(mocks.getUser, be_like);
+      user = await users._helpers.addPreferences(mocks.getUser, beLike);
       user.be_like.should.include('Kevin');
       const addingMultiplePrefs = {like_tags: ['Tennis'], be_like: ['Travis']};
       user = await users._helpers.addPreferences(mocks.getUser, addingMultiplePrefs);
@@ -84,15 +83,14 @@ describe('helper functions', function(){
     });
   });
 
-  describe('removePreferences', function(){
-    it('should return valid user having removed be like and add tags', async function(){
+  describe('removePreferences', function () {
+    it('should return valid user having removed be like and add tags', async function () {
       const remove = {like_tags: ['adventure']};
-      const be_like = {be_like: ['Godzilla']};
+      const beLike = {be_like: ['Godzilla']};
       let user = await users._helpers.removePreferences(mocks.getUser, remove);
       user.like_tags.should.not.include('adventure');
-      user = await users._helpers.removePreferences(mocks.getUser, be_like);
+      user = await users._helpers.removePreferences(mocks.getUser, beLike);
       user.be_like.should.not.include('Godzilla');
     });
   });
-
 });
