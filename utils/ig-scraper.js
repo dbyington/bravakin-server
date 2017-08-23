@@ -102,7 +102,6 @@ class InstagramScraper {
   async getLikeableMediaFromUsername (username) {
     await this._signIn();
     const followers = await this._getFollowersFromUsername(username)
-    console.log(followers);
 
     const media = []
     for (let i = 0; i < followers.length; i++) {
@@ -210,7 +209,6 @@ class InstagramScraper {
             : null;
         }, postLocationSelector)
         .then(location => {
-          console.log(location);
           if (location) {
             this._evalLocation(location)
               .then(parsedLocation => {
@@ -228,7 +226,6 @@ class InstagramScraper {
                     }
                   )
                 }
-                console.log(this.result.user.followers[i]);
               })
           } else throw new Error('No location provided');
         })
