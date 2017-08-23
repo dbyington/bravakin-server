@@ -1,6 +1,7 @@
 const router = require('koa-router')();
 const performanceController = require('./controllers/performance.controller');
-const userController = require('./controllers/users.controller');
+const mediaController = require('./controllers/media.controller');
+const usersController = require('./controllers/users.controller');
 
 router
   .get('/authorize', function (ctx, next) {
@@ -9,25 +10,16 @@ router
   .get('/me/activity', function (ctx, next) {
     ctx.body = 'Hello user!';
   })
-  .get('/me', userController.getUser)
-  .get('/tags/:tag_name', function (ctx, next) {
-    // scraper
-    ctx.body = 'Hello tag name!';
-  })
-  .get('/media/:id', function (ctx, next) {
-    ctx.body = 'Hello media id!';
-  })
+  .get('/me', usersController.getUser)
+  .get('/tags/:tag_name', mediaController.getMediaByTag)
   .get('/performance/:id', performanceController.mediaStats)
   .get('/performance', performanceController.userStats)
   .get('/influence/:id', function (ctx, next) {
     ctx.body = 'Hello influence id!';
   })
-  .get('/influence', userController.userInfluence)
-  .put('/unauthorize', userController.unauthorizeUser)
-  .put('/me', userController.updateUser)
-  .put('/media/:id/like', function (ctx, next) {
-    // scraper
-    ctx.body = 'Update changing my mind on the like!';
-  });
+  .get('/influence', usersController.userInfluence)
+  .put('/unauthorize', usersController.unauthorizeUser)
+  .put('/me', usersController.updateUser)
+  .post('/media/like', mediaController.likeMedia);
 
 module.exports = router;

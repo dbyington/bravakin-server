@@ -66,8 +66,22 @@ async function checkAuth (ctx, next) {
   } else if (!ctx.header.authorization) {
     ctx.throw(401, 'unauthorized');
   }
+<<<<<<< HEAD
 
   return await next();
+=======
+  const authData = ctx.header.authorization.split(' ');
+  const accessToken = authData[1];
+  if (!ctx.state.accessToken) {
+    const user = await User.findOne({access_token: accessToken});
+    if (!user['access_token']) {
+      // not a valid access_token
+      ctx.throw(401, 'unauthorized');
+    }
+    ctx.state.accessToken = accessToken;
+  }
+  await next();
+>>>>>>> feat: like media
 }
 
 module.exports = checkAuth;
