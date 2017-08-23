@@ -12,9 +12,6 @@ router
   })
   .get('/me', usersController.getUser)
   .get('/tags/:tag_name', mediaController.getMediaByTag)
-  .get('/media/:url:/like', function (ctx, next) {
-    ctx.body = 'Hello media id!';
-  })
   .get('/performance/:id', performanceController.mediaStats)
   .get('/performance', performanceController.userStats)
   .get('/influence/:id', function (ctx, next) {
@@ -23,9 +20,6 @@ router
   .get('/influence', usersController.userInfluence)
   .put('/unauthorize', usersController.unauthorizeUser)
   .put('/me', usersController.updateUser)
-  .put('/media/:id/like', function (ctx, next) {
-    // scraper
-    ctx.body = 'Update changing my mind on the like!';
-  });
+  .post('/media/like', mediaController.likeMedia);
 
 module.exports = router;
