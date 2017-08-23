@@ -56,6 +56,32 @@ module.exports.unauthorizeUser = async (ctx, next) => {
   ctx.body = 'OK';
 };
 
+module.exports.userInfluence = async (ctx, next) => {
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  const user = await User.findOne({access_token: accessToken}, {followers: 1});
+  const followers = user['followers'];
+  let locations = followers.filter(f => {
+    if (f.location && f.location.country) return f;
+  })
+    .map(f => f.location.country)
+    .reduce((acc, el) => {
+      const match = acc.find(fe => fe.id === el);
+      if (match) {
+        match['heat']++;
+      } else {
+        acc.push({id: el, heat: 1});
+      }
+      return acc;
+    }, []);
+  const ratio = Math.max(...locations.map(el => el.heat)) / 10;
+  locations = locations.map(el => {
+    el.heat = Math.round(el.heat / ratio);
+    return el;
+  });
+  ctx.status = 200;
+  ctx.body = { data: {locations: locations} };
+}
+
 const getDatabaseUser = async (accessToken) => {
   const user = await User.findOne({access_token: accessToken}, (err, doc) => {
     if (err) console.log('error has been found', err);

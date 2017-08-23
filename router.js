@@ -22,10 +22,7 @@ router
   .get('/influence/:id', function (ctx, next) {
     ctx.body = 'Hello influence id!';
   })
-  .get('/influence', function (ctx, next) {
-    // scraper
-    ctx.body = 'Hello influence!';
-  })
+  .get('/influence', userController.userInfluence)
   .put('/unauthorize', userController.unauthorizeUser)
   .put('/me', userController.updateUser)
   .put('/media/:id/like', function (ctx, next) {
