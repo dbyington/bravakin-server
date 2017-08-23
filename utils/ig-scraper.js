@@ -22,6 +22,8 @@ const postLinkSelector = '._mck9w a'
 const postLocationSelector = '._q8ysx'
 const postHeaderSelector = '._7b8eu'
 
+const likeLinkSelector = '._eszkz'
+
 const tagSearchSelector = '._cmdpi ._mck9w'
 const tagSearchLinkSelector = `${tagSearchSelector} a`
 const tagSearchImageSelector = `${tagSearchSelector} img`
@@ -69,9 +71,10 @@ class InstagramScraper {
    * @returns {Array} An array of media (with link and imageURL) that can be liked.
    */
   async getLikeableMediaFromHashtag (hashtag) {
+    await this._signIn();
     if (!hashtag) throw new Error('Hashtag not provided.')
     const url = `${baseURL}/explore/tags/${hashtag}/`
-    this.nightmare
+    return this.nightmare
       .goto(url)
       .wait(tagSearchSelector)
       .evaluate((tagSearchLinkSelector, tagSearchImageSelector) => {
@@ -133,6 +136,19 @@ class InstagramScraper {
 
     this.end();
     return media;
+  }
+
+  /**
+   * Likes a media on Instagram
+   * @param {string} mediaURL - The URL of the media to like
+   */
+  async likeMedia (mediaURL) {
+    const url = `${baseURL}${mediaURL}`
+    await this._signIn();
+    return this.nightmare
+      .goto(url)
+      .wait(likeLinkSelector)
+      .click(likeLinkSelector)
   }
 
   /**
