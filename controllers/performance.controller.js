@@ -110,7 +110,6 @@ async function _getAggregateStats (model, timeframe, id, raw) {
     { '$sort': { _id: 1 } }
   ]);
 
-  console.log('ref:', ref, '\nresults:', results);
   ref = _checkRef(ref, results);
   if (getRaw) return {reference: ref, results: results};
   const mappedStats = _mapStats(ref, results);
