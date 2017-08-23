@@ -16,7 +16,7 @@ async function _getAccessToken (ctx) {
   };
 
   const postOptions = {
-    url: process.env.URL,
+    url: process.env.OAUTH_URL,
     method: 'POST',
     form: form,
     json: true
