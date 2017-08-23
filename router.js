@@ -4,9 +4,7 @@ const mediaController = require('./controllers/media.controller');
 const usersController = require('./controllers/users.controller');
 
 router
-  .get('/authorize', function (ctx, next) {
-    ctx.redirect(`http://localhost:3001/routeHere?access_token=${ctx.state.accessToken}`);
-  })
+  .get('/authorize', usersController.authorizeUser)
   .get('/me/activity', function (ctx, next) {
     ctx.body = 'Hello user!';
   })

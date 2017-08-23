@@ -1,16 +1,13 @@
 'use strict';
 
+require('dotenv').config();
 const User = require('../models/user.model');
 const UserSerializer = require('../utils/user-serializer');
 const InstagramScraper = require('../utils/ig-scraper');
 const crypto = require('../utils/crypto');
 
 module.exports.authorizeUser = async (ctx, next) => {
-  const accessToken = ctx.header.authorization.split(' ')[1];
-  const user = await getDatabaseUser(accessToken);
-  if (user.error) ctx.throw(user.code, user.error);
-  ctx.status = 200;
-  ctx.body = UserSerializer.serializeWithToken(user);
+  ctx.redirect(`${process.env.OAUTH_FRONTEND_REDIRECT}#access_token=${ctx.state.accessToken}`);
 };
 
 module.exports.getUser = async (ctx, next) => {
