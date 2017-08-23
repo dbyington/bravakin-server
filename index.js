@@ -1,5 +1,4 @@
 const Koa = require('koa');
-const logger = require('koa-logger');
 const bodyParser = require('koa-bodyparser');
 const cors = require('kcors');
 const router = require('./router');
@@ -8,7 +7,6 @@ const db = require('./db');
 
 const app = new Koa();
 app
-  .use(logger())
   .use(cors())
   .use(bodyParser())
   .use(checkAuth)
