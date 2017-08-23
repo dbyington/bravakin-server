@@ -25,17 +25,21 @@ const limits = {
 }
 
 module.exports.userStats = async (ctx, next) => {
+  const accessToken = ctx.header.authorization.split(' ')[1];
   let user;
   const timeframe = ctx['query'].timeframe;
+  if (!timeframe) ctx.throw(400, 'timeframe required');
   try {
-    user = await User.findOne({id: ctx['state'].userId});
+    user = await User.findOne({access_token: accessToken});
   } catch (e) {
     ctx.throw(500, JSON.stringify({error: {status: 500, error_message: e}}));
   }
   const followers = await _getUserFollowerStats(user['id'], timeframe);
   const stats = await _getUserLikeCommentStats(user['id'], timeframe);
   const combinedStats = _combineUserStats(followers, stats);
-  const statsObj = { timeframe: timeframe, stat_type: 'user', id: user['id'], stats: combinedStats }
+  const statsObj = { timeframe: timeframe, stat_type: 'user', id: user['id'], stats: combinedStats };
+  ctx.status = 200;
+  ctx.body = statsObj;
 };
 
 module.exports.mediaStats = async (ctx, next) => {
@@ -43,8 +47,8 @@ module.exports.mediaStats = async (ctx, next) => {
   const mediaId = ctx['params'].id;
   const stats = await _getMediaStats(mediaId, timeframe);
   const statsObj = { timeframe: timeframe, stat_type: 'media', id: mediaId, stats: stats }
-  ctx.status = 200;
   ctx.body = statsObj;
+  ctx.status = 200;
 }
 
 async function _getAggregateStats (model, timeframe, id, raw) {
@@ -52,6 +56,7 @@ async function _getAggregateStats (model, timeframe, id, raw) {
   const getRaw = raw || false;
   const project = {
     day: { $dateToString: {format: '%H', date: '$collected_at'} },
+    hour: { $dateToString: {format: '%Y-%m-%d %H:00', date: '$collected_at'} },
     week: { $isoDayOfWeek: '$collected_at' },
     month: { $isoWeek: '$collected_at' },
     collected_at: 1
@@ -70,7 +75,7 @@ async function _getAggregateStats (model, timeframe, id, raw) {
   let group = {
     _id: `$${timeframe}`,
     timeframe: { $first: `${limits[timeframe].label}` },
-    date: { $first: '$collected_at' }
+    date: { $first: '$hour' }
   };
   if (modelType && modelType.num_followers !== undefined) {
     project['num_followers'] = 1;
@@ -105,6 +110,7 @@ async function _getAggregateStats (model, timeframe, id, raw) {
     { '$sort': { _id: 1 } }
   ]);
 
+  console.log('ref:', ref, '\nresults:', results);
   ref = _checkRef(ref, results);
   if (getRaw) return {reference: ref, results: results};
   const mappedStats = _mapStats(ref, results);
@@ -113,13 +119,7 @@ async function _getAggregateStats (model, timeframe, id, raw) {
 
 const _mapStats = (ref, results) => {
   const keyFilter = ['_id', 'timeframe'];
-  let nowIdx;
   const keys = Object.keys(ref[0]).filter(k => !keyFilter.includes(k));
-  if (Number(ref[0]._id) < Number(results[0]._id)) {
-    nowIdx = results.length - 1;
-  } else {
-    nowIdx = results.findIndex(el => el._id === ref[0]._id);
-  }
   const newResults = results.map((res, idx, arr) => {
     const newObj = {};
     let idxRef;

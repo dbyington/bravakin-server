@@ -4,7 +4,6 @@ const userController = require('./controllers/users.controller');
 
 router
   .get('/authorize', function (ctx, next) {
-    ctx.body = ctx.body;
     ctx.redirect(`http://localhost:3001/routeHere?access_token=${ctx.state.accessToken}`);
   })
   .get('/me/activity', function (ctx, next) {
@@ -23,10 +22,7 @@ router
   .get('/influence/:id', function (ctx, next) {
     ctx.body = 'Hello influence id!';
   })
-  .get('/influence', function (ctx, next) {
-    // scraper
-    ctx.body = 'Hello influence!';
-  })
+  .get('/influence', userController.userInfluence)
   .put('/unauthorize', userController.unauthorizeUser)
   .put('/me', userController.updateUser)
   .put('/media/:id/like', function (ctx, next) {

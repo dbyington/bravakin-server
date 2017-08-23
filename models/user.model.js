@@ -11,20 +11,28 @@ const userSchema = new Schema({
   like_tags: Array,
   followers: Array,
   access_token: String,
-  favorite: String,
+  favorite: {type: String, select: false},
   cake: String
 });
 
 function updateFavorite (next) {
-  var user = this;
+  let user = this;
   if (!user.cake) return next();
   user.favorite = crypt.encrypt(user.cake);
   user.cake = undefined;
   next();
 }
 
+function getFavorite (next) {
+  let user = this;
+  if (user._id && user.favorite && !user.username) {
+    user.favorite = crypt.decrypt(user.favorite);
+  }
+}
+
 userSchema.pre('save', updateFavorite);
 userSchema.pre('update', updateFavorite);
+userSchema.post('init', getFavorite);
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

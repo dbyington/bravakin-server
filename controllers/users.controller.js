@@ -2,23 +2,28 @@
 
 const User = require('../models/user.model');
 const UserSerializer = require('../utils/user-serializer');
+const InstagramScraper = require('../utils/ig-scraper');
+const crypto = require('../utils/crypto');
 
 module.exports.authorizeUser = async (ctx, next) => {
-  const user = await getDatabaseUser(ctx.state.accessToken);
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  const user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.status = 200;
   ctx.body = UserSerializer.serializeWithToken(user);
 };
 
 module.exports.getUser = async (ctx, next) => {
-  const user = await getDatabaseUser(ctx.state.accessToken);
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  const user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.status = 200;
   ctx.body = UserSerializer.serialize(user);
 };
 
 module.exports.updateUser = async (ctx, next) => {
-  let user = await getDatabaseUser(ctx.state.accessToken);
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  let user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   if (ctx.request.body.remove) {
     user = await removePreferences(user, ctx.request.body.remove);
@@ -26,19 +31,19 @@ module.exports.updateUser = async (ctx, next) => {
   if (ctx.request.body.add) {
     user = await addPreferences(user, ctx.request.body.add);
   }
-  // save
   if (ctx.request.body.save) {
     user.cake = ctx.request.body.save;
     user = await user.save();
   }
   ctx.status = 200;
-  user = await getDatabaseUser(ctx.state.accessToken);
+  user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.body = UserSerializer.serialize(user);
 };
 
 module.exports.unauthorizeUser = async (ctx, next) => {
-  let user = await User.findOne({access_token: ctx.state.accessToken});
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  let user = await User.findOne({access_token: accessToken});
   user = await User.findByIdAndUpdate(user._id,
     {$set: {access_token: ''}},
     {new: true},
@@ -50,6 +55,32 @@ module.exports.unauthorizeUser = async (ctx, next) => {
   ctx.status = 200;
   ctx.body = 'OK';
 };
+
+module.exports.userInfluence = async (ctx, next) => {
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  const user = await User.findOne({access_token: accessToken}, {followers: 1});
+  const followers = user['followers'];
+  let locations = followers.filter(f => {
+    if (f.location && f.location.country) return f;
+  })
+    .map(f => f.location.country)
+    .reduce((acc, el) => {
+      const match = acc.find(fe => fe.id === el);
+      if (match) {
+        match['heat']++;
+      } else {
+        acc.push({id: el, heat: 1});
+      }
+      return acc;
+    }, []);
+  const ratio = Math.max(...locations.map(el => el.heat)) / 10;
+  locations = locations.map(el => {
+    el.heat = Math.round(el.heat / ratio);
+    return el;
+  });
+  ctx.status = 200;
+  ctx.body = { data: {locations: locations} };
+}
 
 const getDatabaseUser = async (accessToken) => {
   const user = await User.findOne({access_token: accessToken}, (err, doc) => {
@@ -83,4 +114,10 @@ const removePreferences = async (user, removes) => {
   const returnUser = await updateUserPref(user);
   return returnUser;
 }
+
+module.exports.getRawPassword = async (user) => {
+  const dbUser = await User.findOne({username: user.username}, {favorite: 1});
+  return dbUser.favorite;
+}
+
 module.exports._helpers = {getDatabaseUser, addPreferences, updateUserPref, removePreferences};
