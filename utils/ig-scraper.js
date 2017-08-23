@@ -1,4 +1,5 @@
 const Nightmare = require('nightmare')
+const iso3166 = require('iso3166-1');
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_SECRET
 const googleMapsClient = require('@google/maps').createClient({
@@ -209,16 +210,25 @@ class InstagramScraper {
             : null;
         }, postLocationSelector)
         .then(location => {
+          console.log(location);
           if (location) {
             this._evalLocation(location)
-              .then(response => {
+              .then(parsedLocation => {
+                const countryCode2 = parsedLocation.address_components.find(comp => {
+                  return comp.types.includes('country')
+                }).short_name
+                const country = iso3166.to3(countryCode2);
                 this.result.user.followers[i] = {
                   username: this.result.user.followers[i],
                   location: Object.assign(
-                    response.json.results[0].geometry.location,
-                    { name: location }
+                    parsedLocation.geometry.location,
+                    {
+                      name: location,
+                      country
+                    }
                   )
                 }
+                console.log(this.result.user.followers[i]);
               })
           } else throw new Error('No location provided');
         })
@@ -253,7 +263,7 @@ class InstagramScraper {
     return new Promise((resolve, reject) => {
       googleMapsClient.geocode({ address: location }, (err, response) => {
         if (err) reject(err);
-        else resolve(response);
+        else resolve(response.json.results[0]);
       });
     })
   }
