@@ -2,23 +2,28 @@
 
 const User = require('../models/user.model');
 const UserSerializer = require('../utils/user-serializer');
+const InstagramScraper = require('../utils/ig-scraper');
+const crypto = require('../utils/crypto');
 
 module.exports.authorizeUser = async (ctx, next) => {
-  const user = await getDatabaseUser(ctx.state.accessToken);
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  const user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.status = 200;
   ctx.body = UserSerializer.serializeWithToken(user);
 };
 
 module.exports.getUser = async (ctx, next) => {
-  const user = await getDatabaseUser(ctx.state.accessToken);
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  const user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.status = 200;
   ctx.body = UserSerializer.serialize(user);
 };
 
 module.exports.updateUser = async (ctx, next) => {
-  let user = await getDatabaseUser(ctx.state.accessToken);
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  let user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   if (ctx.request.body.remove) {
     user = await removePreferences(user, ctx.request.body.remove);
@@ -26,19 +31,19 @@ module.exports.updateUser = async (ctx, next) => {
   if (ctx.request.body.add) {
     user = await addPreferences(user, ctx.request.body.add);
   }
-  // save
   if (ctx.request.body.save) {
     user.cake = ctx.request.body.save;
     user = await user.save();
   }
   ctx.status = 200;
-  user = await getDatabaseUser(ctx.state.accessToken);
+  user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
   ctx.body = UserSerializer.serialize(user);
 };
 
 module.exports.unauthorizeUser = async (ctx, next) => {
-  let user = await User.findOne({access_token: ctx.state.accessToken});
+  const accessToken = ctx.header.authorization.split(' ')[1];
+  let user = await User.findOne({access_token: accessToken});
   user = await User.findByIdAndUpdate(user._id,
     {$set: {access_token: ''}},
     {new: true},
@@ -83,4 +88,10 @@ const removePreferences = async (user, removes) => {
   const returnUser = await updateUserPref(user);
   return returnUser;
 }
+
+module.exports.getRawPassword = async (user) => {
+  const dbUser = await User.findOne({username: user.username}, {favorite: 1});
+  return dbUser.favorite;
+}
+
 module.exports._helpers = {getDatabaseUser, addPreferences, updateUserPref, removePreferences};

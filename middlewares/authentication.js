@@ -21,7 +21,7 @@ async function _getAccessToken (ctx) {
     form: form,
     json: true
   };
-  let responseBody = await request.post(postOptions)
+  await request.post(postOptions)
     .then(async data => {
       if (!data.user.id) ctx.throw(401, 'unauthorized');
       let user = await User.findOne({id: data.user.id});
@@ -53,12 +53,11 @@ async function _getAccessToken (ctx) {
       ctx.state.userId = user.id;
       return user;
     })
-    .catch(err => {
-      ctx.throw(401, 'unauthorized');
+    .catch(errorHandler);
+}
 
-    });
-  ctx.status = 200;
-  ctx.body = UserSerializer.serializeWithToken(responseBody);
+function errorHandler (e) {
+  throw (e);
 }
 
 async function checkAuth (ctx, next) {
@@ -67,17 +66,8 @@ async function checkAuth (ctx, next) {
   } else if (!ctx.header.authorization) {
     ctx.throw(401, 'unauthorized');
   }
-  const authData = ctx.header.authorization.split(' ');
-  const accessToken = authData[1];
-  if (!ctx.state.accessToken) {
-    const user = await User.findOne({access_token: accessToken});
-    if (!user['access_token']) {
-      // not a valid access_token
-      ctx.throw(401, 'unauthorized');
-    }
-    ctx.state.accessToken = accessToken;
-  }
-  next();
+
+  return await next();
 }
 
 module.exports = checkAuth;

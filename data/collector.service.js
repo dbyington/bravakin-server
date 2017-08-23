@@ -5,13 +5,15 @@ const UserStats = require('../models/user-stats.model');
 const Media = require('../models/media.model');
 const MediaStats = require('../models/media-stats.model');
 const InstagramScraper = require('../utils/ig-scraper');
+const usersController = require('../controllers/users.controller')
+const crypto = require('../utils/crypto');
 
 class Collector {
   async scrapeFollowersLocation () {
     try {
       const users = await User.find()
       for (const user of users) {
-        const igScraper = new InstagramScraper(user.username, user.getRawPassword());
+        const igScraper = new InstagramScraper(user.username, usersController.getRawPassword(user));
         const result = await igScraper.scrapeFollowers();
         // Save the result
       };
@@ -26,9 +28,7 @@ class Collector {
       if (dbMedia['_id']) {
         await this._saveMediaStat(dbMedia, media);
       } else {
-        // insert new media
         await this._insertNewMedia(dbMedia);
-        // insert new media stats
         dbMedia = await Media.findOne({title: media['title']});
         if (dbMedia['_id']) {
           await this._saveMediaStat(dbMedia, media);
@@ -107,6 +107,7 @@ class Collector {
       console.log('error saving media stats:', e);
     }
   }
+
 }
 
 module.exports = Collector;

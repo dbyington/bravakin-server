@@ -4,7 +4,6 @@ const userController = require('./controllers/users.controller');
 
 router
   .get('/authorize', function (ctx, next) {
-    ctx.body = ctx.body;
     ctx.redirect(`http://localhost:3001/routeHere?access_token=${ctx.state.accessToken}`);
   })
   .get('/me/activity', function (ctx, next) {
