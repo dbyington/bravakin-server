@@ -7,6 +7,10 @@
     "start": "node index.js",
     "test": "mocha"
   },
+  "engines": {
+    "node": "8.1",
+    "npm": "5"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dbyington/bravakin-server.git"
