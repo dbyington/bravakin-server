@@ -1,5 +1,6 @@
 'use strict';
 
+require('dotenv').config();
 const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 const User = require('../models/user.model');
@@ -33,7 +34,7 @@ const setPasswd = async () => {
   }
 }
 
-mongoose.connect('mongodb://localhost/bravakin', {useMongoClient: true});
+mongoose.connect(process.env.MONGODB_URI, {useMongoClient: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', setPasswd);
