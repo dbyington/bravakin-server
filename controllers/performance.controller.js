@@ -12,6 +12,7 @@ const limits = {
     ref: 1000 * 3600 * 25,
     label: 'hour'
   },
+  hour: Math.round(1000 * 3600 * 0.5),
   week: {
     msec: 1000 * 3600 * 24 * 7,
     ref: 1000 * 3600 * 24 * 8,
@@ -139,13 +140,27 @@ const _mapStats = (ref, results) => {
 }
 
 const _checkRef = (refArr = [], res) => {
-  if (refArr.length > 0) return refArr;
-  let ref = [...refArr];
-  ref = Object.assign({}, res[0]);
-  for (let i = 0; i < res.length; i++) {
-    if (res[i + 1] && Number(res[i + 1]._id) > Number(res[i]._id) + 1) {
-      ref = Object.assign({}, res[i]);
+  let ref;
+  let logGap = false;
+  if (!refArr[0].date) {
+    ref = [...refArr];
+  }
+  const refDate = new Date(refArr[0].date);
+  const resDate = new Date(res[0].date);
+  if (refArr.length > 0 && refDate - resDate < res[0].timeframe) return refArr;
+  if (resDate - refDate > limits[res[0].timeframe]) {
+    ref = Object.assign({}, res[0]);
+    logGap = true;
+  }
+  if (!logGap) {
+    for (let i = 0; i < res.length; i++) {
+      if (res[i + 1] && Number(res[i + 1]._id) > Number(res[i]._id) + 1) {
+        ref = Object.assign({}, res[i]);
+      }
     }
+    ['likes', 'comments', 'followers'].forEach(prop => {
+      if (ref[prop]) ref[prop] = 0;
+    });
   }
   if (Number(ref['_id']) > 1) {
     ref['_id'] = (Number(ref['_id']) - 1).toString().padStart(2, '0');
@@ -154,9 +169,6 @@ const _checkRef = (refArr = [], res) => {
   } else {
     ref['_id'] = (Number(res[res.length - 1]['_id']) + 1).toString().padStart(2, '0');
   }
-  ['likes', 'comments', 'followers'].forEach(prop => {
-    if (ref[prop]) ref[prop] = 0;
-  });
   return [ref];
 }
 
