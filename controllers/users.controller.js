@@ -14,8 +14,9 @@ module.exports.getUser = async (ctx, next) => {
   const accessToken = ctx.header.authorization.split(' ')[1];
   const user = await getDatabaseUser(accessToken);
   if (user.error) ctx.throw(user.code, user.error);
+  let newUser = Object.assign({}, UserSerializer.serialize(user), {followers: user['followers'].length});
   ctx.status = 200;
-  ctx.body = UserSerializer.serialize(user);
+  ctx.body = newUser;
 };
 
 module.exports.updateUser = async (ctx, next) => {
