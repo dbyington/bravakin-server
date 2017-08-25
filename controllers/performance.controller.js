@@ -113,7 +113,6 @@ async function _getAggregateStats (model, timeframe, id, raw) {
   ]);
 
   ref = _checkRef(ref, results);
-  console.log('ref/results:', ref);
   if (getRaw) return {reference: ref, results: results};
   const mappedStats = _mapStats(ref, results);
   return mappedStats;
@@ -155,7 +154,6 @@ const _checkRef = (refArr = [], res) => {
   if (!logGap) {
     for (let i = 0; i < res.length; i++) {
       if (res[i + 1] && Number(res[i + 1]._id) > Number(res[i]._id) + 1) {
-        console.log('I:', i);
         ref = Object.assign({}, res[i + 1]);
       }
     }
