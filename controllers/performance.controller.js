@@ -142,8 +142,8 @@ const _mapStats = (ref, results) => {
 const _checkRef = (refArr = [], res) => {
   let ref;
   let logGap = false;
-  if (!refArr[0].date) {
-    ref = [...refArr];
+  if (refArr.length === 0) {
+    refArr[0] = res[0];
   }
   const refDate = new Date(refArr[0].date);
   const resDate = new Date(res[0].date);
