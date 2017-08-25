@@ -1,5 +1,6 @@
 'use strict';
 
+const moment = require('moment');
 const User = require('../models/user.model');
 const UserStats = require('../models/user-stats.model');
 const Media = require('../models/media.model');
@@ -12,7 +13,7 @@ const limits = {
     ref: 1000 * 3600 * 25,
     label: 'hour'
   },
-  hour: Math.round(1000 * 3600 * 0.5),
+  hour: 1000 * 3600,
   week: {
     msec: 1000 * 3600 * 24 * 7,
     ref: 1000 * 3600 * 24 * 8,
@@ -112,6 +113,7 @@ async function _getAggregateStats (model, timeframe, id, raw) {
   ]);
 
   ref = _checkRef(ref, results);
+  console.log('ref/results:', ref);
   if (getRaw) return {reference: ref, results: results};
   const mappedStats = _mapStats(ref, results);
   return mappedStats;
@@ -140,12 +142,10 @@ const _mapStats = (ref, results) => {
 }
 
 const _checkRef = (refArr = [], res) => {
-  let ref;
+  if (refArr.length > 0) return refArr;
+  let ref = [Object.assign({}, res[0])];
   let logGap = false;
-  if (refArr.length === 0) {
-    refArr[0] = res[0];
-  }
-  const refDate = new Date(refArr[0].date);
+  const refDate = new Date(ref[0].date);
   const resDate = new Date(res[0].date);
   if (refArr.length > 0 && refDate - resDate < res[0].timeframe) return refArr;
   if (resDate - refDate > limits[res[0].timeframe]) {
@@ -155,15 +155,14 @@ const _checkRef = (refArr = [], res) => {
   if (!logGap) {
     for (let i = 0; i < res.length; i++) {
       if (res[i + 1] && Number(res[i + 1]._id) > Number(res[i]._id) + 1) {
-        ref = Object.assign({}, res[i]);
+        console.log('I:', i);
+        ref = Object.assign({}, res[i + 1]);
       }
     }
-    ['likes', 'comments', 'followers'].forEach(prop => {
-      if (ref[prop]) ref[prop] = 0;
-    });
   }
   if (Number(ref['_id']) > 1) {
     ref['_id'] = (Number(ref['_id']) - 1).toString().padStart(2, '0');
+    ref['date'] = moment(new Date(new Date(ref['date']) - limits[ref['timeframe']])).format('YYYY-MM-DD kk:mm');
   } else if (ref['timeframe'] === 'hour' && Number(ref['_id']) === 1) {
     ref['_id'] = '00';
   } else {
