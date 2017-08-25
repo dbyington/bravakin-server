@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 const User = require('../models/user.model');
+const UserStats = require('../models/user-stats.model');
 const UserSerializer = require('../utils/user-serializer');
 const InstagramScraper = require('../utils/ig-scraper');
 const crypto = require('../utils/crypto');
@@ -13,8 +14,9 @@ module.exports.authorizeUser = async (ctx, next) => {
 module.exports.getUser = async (ctx, next) => {
   const accessToken = ctx.header.authorization.split(' ')[1];
   const user = await getDatabaseUser(accessToken);
+  const userStats = await UserStats.find({id: user['id']}).sort({collected_by: -1}).limit(1);
   if (user.error) ctx.throw(user.code, user.error);
-  let newUser = Object.assign({}, UserSerializer.serialize(user), {followers: user['followers'].length});
+  let newUser = Object.assign({}, UserSerializer.serialize(user), {followers: userStats[0].num_followers});
   ctx.status = 200;
   ctx.body = newUser;
 };

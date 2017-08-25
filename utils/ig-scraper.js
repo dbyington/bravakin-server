@@ -195,7 +195,7 @@ class InstagramScraper {
         const [posts, followers, following] = parsed
         Object.assign(this.result.user, {
           posts,
-          followers,
+          num_followers: followers,
           following
         })
       })
